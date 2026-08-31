@@ -99,10 +99,368 @@
 	  });
 	}
 
-	document.addEventListener('DOMContentLoaded', () => {
+	function initBlogCardFilters() {
+	  const filterGroups = document.querySelectorAll("[data-blog-filter-group]");
+	  filterGroups.forEach(group => {
+	    const block = group.closest(".cb-blog-cards");
+	    if (!block) {
+	      return;
+	    }
+	    const buttons = group.querySelectorAll("[data-blog-filter]");
+	    const cards = block.querySelectorAll("[data-blog-card]");
+	    if (!buttons.length || !cards.length) {
+	      return;
+	    }
+	    const setActiveFilter = selectedFilter => {
+	      buttons.forEach(button => {
+	        const isActive = button.dataset.blogFilter === selectedFilter;
+	        button.classList.toggle("is-active", isActive);
+	        button.setAttribute("aria-pressed", isActive ? "true" : "false");
+	      });
+	      cards.forEach(card => {
+	        const categories = (card.dataset.categories || "").split(" ").filter(Boolean);
+	        const shouldShow = selectedFilter === "all" || categories.includes(selectedFilter);
+	        card.hidden = !shouldShow;
+	      });
+	    };
+	    buttons.forEach(button => {
+	      button.addEventListener("click", () => {
+	        setActiveFilter(button.dataset.blogFilter || "all");
+	      });
+	    });
+	    setActiveFilter("all");
+	  });
+	}
+
+	/**
+	 * Smooth scroll via Lenis (https://lenis.darkroom.engineering/), loaded as a
+	 * global from the CDN build in inc/enqueue.php — 'lenis' is a script
+	 * dependency of theme.min.js so window.Lenis is guaranteed to exist here.
+	 */
+	function initLenis() {
+	  if (typeof Lenis === 'undefined') return;
+	  const lenis = new Lenis();
+	  function raf(time) {
+	    lenis.raf(time);
+	    requestAnimationFrame(raf);
+	  }
+	  requestAnimationFrame(raf);
+	}
+
+	/**
+	 * [data-reveal] — this theme's lightweight, hand-rolled equivalent of AOS.
+	 * See src/css/animate.css for the CSS half of this convention.
+	 *
+	 * Three globals, all exposed on window (not just ES exports) specifically
+	 * so per-block view.js files can call them — those are separate, unbundled
+	 * scripts outside this rollup build and can't import from it:
+	 *
+	 * - window.cbReveal(el, delaySeconds) — animates one element in. Also
+	 *   auto-runs window.cbScribble(el) the instant its own fade-in completes,
+	 *   so any revealed element containing an <em> gets the RoughNotation
+	 *   underline for free, correctly timed, no extra wiring needed.
+	 * - window.cbScribble(container) — RoughNotation-underlines every <em>
+	 *   inside `container`. Standalone too, e.g. cb-hero calls this directly
+	 *   on its own h1 once the typewriter finishes, since that element isn't
+	 *   part of the [data-reveal] system at all.
+	 * - window.cbRevealSequence(container) — staggers every [data-reveal]
+	 *   child of `container` in DOM order via window.cbReveal.
+	 *
+	 * Default behaviour: any [data-reveal-container] auto-sequences its
+	 * [data-reveal] children the moment it scrolls into view. A standalone
+	 * [data-reveal] with no [data-reveal-container] ancestor auto-reveals
+	 * itself the same way.
+	 *
+	 * Opt-out: add data-reveal-manual to a [data-reveal-container] (or a
+	 * standalone [data-reveal]) and this file leaves it alone — some other
+	 * script decides when to trigger it instead, by calling
+	 * window.cbRevealSequence()/window.cbReveal() directly. cb-hero uses this
+	 * for its subtitle/CTA, gated on its typewriter finishing rather than on
+	 * scroll position.
+	 */
+
+	window.cbScribble = function (container) {
+	  if (typeof RoughNotation === 'undefined') {
+	    /*
+	     * Warn rather than return quietly. rough-notation is a global
+	     * dependency of this bundle (see inc/enqueue.php), so reaching here
+	     * means it failed to load — CDN blocked, offline, or the dependency
+	     * dropped from the enqueue. Silent was how this went unnoticed on
+	     * every page but two: a missing underline is indistinguishable from
+	     * a heading that simply has no <em> in it.
+	     */
+	    if (window.console && console.warn) {
+	      console.warn('cbScribble: RoughNotation is not loaded — .cb-scribble-text underlines will not render.');
+	    }
+	    return;
+	  }
+	  container.querySelectorAll('em').forEach(function (em) {
+	    RoughNotation.annotate(em, {
+	      type: 'underline',
+	      color: '#FF4848',
+	      strokeWidth: 5,
+	      iterations: 3,
+	      padding: 4,
+	      animationDuration: 700,
+	      multiline: true
+	    }).show();
+	  });
+	};
+	window.cbReveal = function (el, delaySeconds) {
+	  if (typeof gsap === 'undefined') {
+	    el.style.opacity = '1';
+	    el.style.transform = 'none';
+	    window.cbScribble(el);
+	    return;
+	  }
+	  gsap.to(el, {
+	    opacity: 1,
+	    /*
+	     * Every transform component the CSS half might start an element
+	     * from, reset to its resting value — see [data-reveal-from] in
+	     * src/css/animate.css. Each is a no-op for elements that weren't
+	     * offset that way, so one tween serves every variant; animating y
+	     * alone would leave a horizontally offset or scaled element
+	     * stranded at its start state, faded in but never arriving.
+	     */
+	    x: 0,
+	    y: 0,
+	    scale: 1,
+	    duration: 0.6,
+	    ease: 'power2.out',
+	    delay: delaySeconds || 0,
+	    onComplete: function () {
+	      window.cbScribble(el);
+	    }
+	  });
+	};
+	window.cbRevealSequence = function (container, stagger) {
+	  var gap = stagger || parseFloat(container.dataset.revealStagger) || 0.15;
+	  container.querySelectorAll('[data-reveal]').forEach(function (el, i) {
+	    window.cbReveal(el, i * gap);
+	  });
+	};
+	function cbObserveOnce(el, callback) {
+	  if (typeof IntersectionObserver === 'undefined') {
+	    callback();
+	    return;
+	  }
+	  var observer = new IntersectionObserver(function (entries, obs) {
+	    entries.forEach(function (entry) {
+	      if (!entry.isIntersecting) return;
+	      callback();
+	      obs.unobserve(entry.target);
+	    });
+	  }, {
+	    threshold: 0.2
+	  });
+	  observer.observe(el);
+	}
+	function initReveal() {
+	  if (typeof gsap === 'undefined' || !('IntersectionObserver' in window)) {
+	    document.querySelectorAll('[data-reveal]').forEach(function (el) {
+	      el.style.opacity = '1';
+	      el.style.transform = 'none';
+	    });
+	    return;
+	  }
+	  document.querySelectorAll('[data-reveal-container]:not([data-reveal-manual])').forEach(function (container) {
+	    cbObserveOnce(container, function () {
+	      window.cbRevealSequence(container);
+	    });
+	  });
+	  document.querySelectorAll('[data-reveal]:not([data-reveal-manual])').forEach(function (el) {
+	    if (el.closest('[data-reveal-container]')) return;
+	    cbObserveOnce(el, function () {
+	      window.cbReveal(el);
+	    });
+	  });
+	}
+
+	function initServiceDetails() {
+	  const groups = document.querySelectorAll("[data-service-details-items]");
+	  if (!groups.length) {
+	    return;
+	  }
+	  const updateActiveItem = items => {
+	    const block = items[0]?.closest(".cb-service-details");
+	    const topOffset = block ? parseFloat(getComputedStyle(block).getPropertyValue("--cb-service-details-top-offset")) || 140 : window.innerWidth >= 992 ? 140 : 96;
+	    let activeItem = items[0];
+	    let closestDistance = Number.POSITIVE_INFINITY;
+	    items.forEach(item => {
+	      const distance = Math.abs(item.getBoundingClientRect().top - topOffset);
+	      if (distance < closestDistance) {
+	        closestDistance = distance;
+	        activeItem = item;
+	      }
+	    });
+	    items.forEach(item => {
+	      item.classList.toggle("is-active", item === activeItem);
+	    });
+	  };
+	  groups.forEach(group => {
+	    const items = Array.from(group.querySelectorAll("[data-service-details-item]"));
+	    if (!items.length) {
+	      return;
+	    }
+	    const onUpdate = () => updateActiveItem(items);
+	    onUpdate();
+	    window.addEventListener("scroll", onUpdate, {
+	      passive: true
+	    });
+	    window.addEventListener("resize", onUpdate);
+	  });
+	}
+
+	function initSingleProgress() {
+	  const bar = document.querySelector("[data-single-progress]");
+	  const contentCol = document.querySelector(".single-post__content-col");
+	  if (!bar || !contentCol) {
+	    return;
+	  }
+	  const body = bar.closest(".single-post__body");
+	  const progressWrap = bar.closest(".single-post__progress");
+	  if (!body || !progressWrap) {
+	    return;
+	  }
+	  const update = () => {
+	    const headerHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-height")) || 0;
+	    const adminBarHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--admin-bar-height")) || 0;
+	    const stickyTop = headerHeight + adminBarHeight + progressWrap.offsetHeight;
+	    const rect = contentCol.getBoundingClientRect();
+	    const contentHeight = contentCol.offsetHeight;
+	    const viewportHeight = window.innerHeight;
+	    const totalScrollable = contentHeight - viewportHeight + stickyTop;
+	    if (totalScrollable <= 0) {
+	      bar.style.transform = "scaleX(1)";
+	      return;
+	    }
+	    const scrolled = stickyTop - rect.top;
+	    const progress = Math.min(Math.max(scrolled / totalScrollable, 0), 1);
+	    bar.style.transform = `scaleX(${progress})`;
+	  };
+	  update();
+	  window.addEventListener("scroll", update, {
+	    passive: true
+	  });
+	  window.addEventListener("resize", update);
+	}
+
+	function initSingleQuicklinks() {
+	  const sidebars = document.querySelectorAll("[data-single-quicklinks]");
+	  sidebars.forEach(sidebar => {
+	    if (window.innerWidth < 992) {
+	      return;
+	    }
+	    const links = Array.from(sidebar.querySelectorAll("[data-single-quicklink]"));
+	    if (!links.length) {
+	      return;
+	    }
+	    const targets = links.map(link => {
+	      const id = link.getAttribute("href")?.replace(/^#/, "");
+	      if (!id) {
+	        return null;
+	      }
+	      return {
+	        link,
+	        target: document.getElementById(id)
+	      };
+	    }).filter(item => item && item.target);
+	    if (!targets.length) {
+	      return;
+	    }
+	    const setActive = activeLink => {
+	      targets.forEach(({
+	        link
+	      }) => {
+	        link.classList.toggle("is-active", link === activeLink);
+	      });
+	    };
+	    const updateActive = () => {
+	      const stickyParent = sidebar.closest(".single-post__sidebar-col");
+	      const topOffset = stickyParent ? parseFloat(getComputedStyle(stickyParent).top) || 160 : 160;
+	      const activationOffset = topOffset + 120;
+	      let activeItem = targets[0];
+	      targets.forEach(item => {
+	        if (item.target.getBoundingClientRect().top - activationOffset <= 0) {
+	          activeItem = item;
+	        }
+	      });
+	      setActive(activeItem.link);
+	    };
+	    targets.forEach(({
+	      link,
+	      target
+	    }) => {
+	      link.addEventListener("click", () => {
+	        setActive(link);
+	        if (target) {
+	          history.replaceState(null, "", `#${target.id}`);
+	        }
+	      });
+	    });
+	    updateActive();
+	    window.addEventListener("scroll", updateActive, {
+	      passive: true
+	    });
+	    window.addEventListener("resize", updateActive);
+	  });
+	}
+
+	function initStatGrid() {
+	  const statValues = document.querySelectorAll("[data-stat-target]");
+	  if (!statValues.length) {
+	    return;
+	  }
+	  const animateValue = element => {
+	    const target = Number(element.dataset.statTarget || 0);
+	    if (!Number.isFinite(target)) {
+	      element.textContent = "0";
+	      return;
+	    }
+	    const duration = 1400;
+	    const start = performance.now();
+	    const step = now => {
+	      const progress = Math.min((now - start) / duration, 1);
+	      const eased = 1 - Math.pow(1 - progress, 3);
+	      element.textContent = Math.round(target * eased).toLocaleString();
+	      if (progress < 1) {
+	        window.requestAnimationFrame(step);
+	      }
+	    };
+	    window.requestAnimationFrame(step);
+	  };
+	  if (!("IntersectionObserver" in window)) {
+	    statValues.forEach(animateValue);
+	    return;
+	  }
+	  const observer = new IntersectionObserver((entries, currentObserver) => {
+	    entries.forEach(entry => {
+	      if (!entry.isIntersecting) {
+	        return;
+	      }
+	      animateValue(entry.target);
+	      currentObserver.unobserve(entry.target);
+	    });
+	  }, {
+	    threshold: 0.35
+	  });
+	  statValues.forEach(element => {
+	    observer.observe(element);
+	  });
+	}
+
+	document.addEventListener("DOMContentLoaded", () => {
 	  initNavToggle();
 	  initNavDropdowns();
 	  initDialogs();
+	  initBlogCardFilters();
+	  initServiceDetails();
+	  initSingleProgress();
+	  initSingleQuicklinks();
+	  initStatGrid();
+	  initLenis();
+	  initReveal();
 	});
 
 })();

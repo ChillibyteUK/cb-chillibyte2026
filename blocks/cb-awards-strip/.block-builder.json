@@ -1,0 +1,20 @@
+{
+	"title": "CB Awards Strip",
+	"color_support": true,
+	"fields": [
+		{
+			"label": "Awards",
+			"type": "gallery",
+			"help": "",
+			"width": 100,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "awards",
+			"snake": "awards",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		}
+	]
+}

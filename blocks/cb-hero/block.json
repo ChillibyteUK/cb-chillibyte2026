@@ -1,0 +1,47 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cb-chillibyte-2026/cb-hero",
+	"title": "CB Hero",
+	"category": "cb-chillibyte-2026",
+	"icon": "cover-image",
+	"attributes": {
+		"isHomepage": {
+			"type": "boolean",
+			"default": false
+		},
+		"animation": {
+			"type": "string",
+			"default": ""
+		},
+		"heroTitle": {
+			"type": "string",
+			"default": ""
+		},
+		"subtitle": {
+			"type": "string",
+			"default": ""
+		},
+		"ctaText": {
+			"type": "string",
+			"default": ""
+		},
+		"ctaUrl": {
+			"type": "string",
+			"default": ""
+		},
+		"ctaTarget": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"className": true,
+		"align": true
+	},
+	"editorScript": "file:./build/index.js",
+	"viewScript": [ "cb-chillibyte-2026-theme", "file:./view.js", "file:../../animation/js/reveal.js" ],
+	"style": "file:../../animation/css/reveal.css",
+	"render": "file:./render.php"
+}

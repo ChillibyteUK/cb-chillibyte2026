@@ -4,13 +4,13 @@ input,
 textarea,
 select,
 button {
-	font-family: inherit;
-	font-size: inherit;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 label {
-	display: block;
-	margin-bottom: var(--space-1);
+  display: block;
+  margin-bottom: var(--space-1);
 }
 
 /* Excludes button/checkbox/radio/range/color/file/image input types —
@@ -21,35 +21,118 @@ label {
    regardless of style load order, unlike an "apply then all:revert" pass
    which can fight with e.g. ACF's own admin CSS for its radio/checkbox UI
    if that CSS happens to load earlier in the same document. */
-input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="image"]),
+input:not([type="button"]):not([type="submit"]):not([type="reset"]):not(
+    [type="checkbox"]
+  ):not([type="radio"]):not([type="range"]):not([type="color"]):not(
+    [type="file"]
+  ):not([type="image"]),
 textarea,
 select {
-	display: block;
-	width: 100%;
-	padding: var(--space-2);
-	border: 1px solid var(--col-grey-300);
-	border-radius: var(--radius-sm);
-	background-color: var(--col-white);
-	color: var(--col-body);
+  display: block;
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--col-grey-300);
+  border-radius: var(--radius-sm);
+  background-color: var(--col-white);
+  color: var(--col-body);
 
-	&:focus-visible {
-		outline: 2px solid var(--col-primary);
-		outline-offset: 1px;
-	}
+  &:focus-visible {
+    outline: 2px solid var(--col-primary);
+    outline-offset: 1px;
+  }
 }
 
 .btn {
-	display: inline-block;
-	padding: var(--space-2) var(--space-3);
-	border: 1px solid var(--col-primary);
-	border-radius: var(--radius-sm);
-	background-color: var(--col-primary);
-	color: var(--col-white);
-	text-decoration: none;
-	cursor: pointer;
+  display: inline-block;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--col-primary);
+  border-radius: var(--radius-sm);
+  background-color: var(--col-primary);
+  color: var(--col-white);
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1;
+  /* Trims the label's text box to the font's actual cap-height/baseline —
+     line-height: 1 alone doesn't fix a typeface's asymmetric ascent/descent
+     metrics, which is what made equal top/bottom padding look uneven. */
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 
-	&:focus-visible {
-		outline: 2px solid var(--col-primary);
-		outline-offset: 2px;
-	}
+  font-size: var(--fs-base);
+  font-weight: var(--fw-800);
+
+  transition:
+    background-color var(--transition),
+    color var(--transition),
+    border-color var(--transition);
+
+  &:focus-visible {
+    outline: 2px solid var(--col-primary);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * Modifier, not a variant — stack with .btn (and .btn-green etc.):
+ * <a class="btn btn-green btn-arrow">. Arrow is a masked SVG rather than an
+ * <img>/icon font (no icon fonts in this theme) — mask-image + currentColor
+ * means it automatically matches whatever text colour the button variant
+ * sets, no separate coloured asset needed per variant.
+ */
+.btn-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  &::after {
+    content: "";
+    width: 1em;
+    height: 1em;
+    background-color: currentColor;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E");
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    transition: transform var(--transition);
+  }
+
+  &:hover::after,
+  &:focus-visible::after {
+    transform: translateX(4px);
+  }
+}
+
+.btn-green {
+  background-color: var(--col-brand-green);
+  border-color: var(--col-brand-green);
+  color: var(--col-black);
+  &:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--col-brand-green) 80%,
+      var(--col-white)
+    );
+  }
+  &:focus-visible {
+    outline: 2px solid var(--col-brand-green);
+    outline-offset: 2px;
+  }
+  border-color: var(--col-brand-green);
+}
+
+.btn-green-outline {
+  background-color: var(--col-white);
+  border-color: var(--col-brand-green);
+  color: var(--col-black);
+  &:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--col-brand-green) 10%,
+      var(--col-white)
+    );
+  }
+  &:focus-visible {
+    outline: 2px solid var(--col-brand-green);
+    outline-offset: 2px;
+  }
 }

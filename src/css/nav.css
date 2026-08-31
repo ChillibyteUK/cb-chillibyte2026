@@ -5,137 +5,291 @@
  * if you change the "lg" breakpoint there, update it here too.
  */
 
+/*
+ * Header height, declared once and consumed in three places below: the
+ * fixed header itself has no flow height, so main's top padding and the
+ * scroll-anchor offset both have to be told what to reserve. Derived from
+ * .navbar-brand img's height plus .navbar's padding-block on both edges —
+ * change either of those and this follows automatically.
+ */
+:root {
+  --header-height: calc(40px + var(--space-2) * 2);
+  --admin-bar-height: 0px;
+}
+
+/*
+ * WordPress pushes the document down with `html { margin-top: 32px }` when
+ * the admin bar is showing, but #wpadminbar is itself position: fixed — so a
+ * fixed header at top: 0 is positioned against the viewport and slides
+ * underneath it. Offsetting by the bar's height is the fix.
+ *
+ * Scoped with :has() so the value lands on :root rather than body: html is
+ * the scroll container, and scroll-padding-top below can't read a custom
+ * property declared on a descendant. (:has() is already relied on
+ * unconditionally at this theme's browser baseline.)
+ *
+ * Caveat: at <=600px core switches #wpadminbar to position: absolute so it
+ * scrolls away, and this offset then leaves a 46px gap under the header once
+ * you scroll. Logged-in-only, so it's cosmetic on a phone-width admin view.
+ */
+:root:has(body.admin-bar) {
+  --admin-bar-height: 32px;
+}
+
+@media screen and (max-width: 782px) {
+  :root:has(body.admin-bar) {
+    --admin-bar-height: 46px;
+  }
+}
+
+/*
+ * Fixed rather than sticky, so the header stays put over scrolling content
+ * rather than only pinning once it reaches the top.
+ *
+ * Applied to #masthead rather than .navbar — .navbar is position: relative
+ * as the containing block for the mobile .navbar-collapse panel, and taking
+ * that element out of flow instead would drag the panel's anchor with it.
+ *
+ * The opaque background is load-bearing, not decoration: without it the
+ * content passing underneath shows straight through.
+ */
+#masthead {
+  position: fixed;
+  inset: var(--admin-bar-height) 0 auto;
+  /* above .navbar-collapse.is-open (20) and the hero's internal 0/1 —
+	   .cb-hero isolates its own stacking context, so those can't escape */
+  z-index: 100;
+  background-color: var(--col-body-bg);
+}
+
+/*
+ * Reclaim the space the fixed header no longer occupies in flow, so the
+ * first block on the page doesn't start underneath it.
+ */
+main#main {
+  padding-top: var(--header-height);
+}
+
+/*
+ * Stop in-page anchors (the skip link's #main included) landing underneath
+ * the fixed header.
+ */
+html {
+  scroll-padding-top: calc(var(--header-height) + var(--admin-bar-height));
+}
+
 .navbar {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding-block: var(--space-2);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--space-2);
 }
 
 .navbar-brand {
-	font-weight: var(--fw-700);
-	text-decoration: none;
-	color: var(--col-body);
+  display: block;
+  /* the img is a block child, but zeroing this stops the anchor reserving
+	   line-box descender space and sitting taller than the logo itself */
+  line-height: 0;
+  text-decoration: none;
+  color: var(--col-body);
+
+  img {
+    width: 190px;
+    /* base.css sets height:auto on every img — restate it here or the
+		   box collapses to the logo's own ratio and ignores the 40px */
+    height: 40px;
+    /* chillibyte.svg is 3041.4x656.7 (ratio 4.63); 190x40 is 4.75, so
+		   filling the box exactly would stretch it ~2.5% horizontally.
+		   contain keeps the artwork true and letterboxes the ~5px
+		   difference instead. */
+    object-fit: contain;
+    object-position: left center;
+  }
 }
 
 .navbar-toggler {
-	display: inline-flex;
-	align-items: center;
-	gap: var(--space-1);
-	padding: var(--space-1) var(--space-2);
-	border: 1px solid var(--col-grey-300);
-	border-radius: var(--radius-sm);
-	background: none;
-	cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--col-grey-300);
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
 }
 
 .navbar-collapse {
-	display: none;
+  display: none;
 }
 
 /* Overlays the page rather than pushing content down — positioned against
    .navbar (position: relative above), not in normal document flow. */
 .navbar-collapse.is-open {
-	display: block;
-	position: absolute;
-	top: 100%;
-	left: 0;
-	right: 0;
-	background-color: var(--col-body-bg);
-	border-top: 1px solid var(--col-grey-300);
-	box-shadow: var(--shadow-lg);
-	padding: var(--space-3);
-	max-height: calc(100vh - 100%);
-	overflow-y: auto;
-	z-index: 20;
+  display: block;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--col-body-bg);
+  border-top: 1px solid var(--col-grey-300);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-3);
+  max-height: calc(100vh - 100%);
+  overflow-y: auto;
+  z-index: 20;
 }
 
 .navbar-nav {
-	display: flex;
-	flex-direction: column;
-	gap: var(--space-2);
-	margin: 0;
-	padding: 0;
-	list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .nav-link {
-	display: block;
-	text-decoration: none;
-	color: var(--col-body);
-	padding: var(--space-1) 0;
+  display: block;
+  text-decoration: none;
+  color: var(--col-black);
+  font-weight: var(--fw-800);
+  padding: var(--space-1) 0;
 
-	&.active,
-	&[aria-current="page"] {
-		font-weight: var(--fw-600);
-	}
+  &:hover,
+  &:focus-visible {
+    color: var(--col-brand-red);
+  }
+
+  /*
+	 * Declared after :hover so the current page stays green while hovered —
+	 * "you are here" is persistent state, and flickering it to the hover
+	 * colour reads as if you'd navigated away. Swap the two blocks if you'd
+	 * rather hover always win.
+	 */
+  &.active,
+  &[aria-current="page"] {
+    color: var(--col-brand-green);
+  }
 }
 
 /* Submenus — nested, always visible on mobile; shown via click as a
    floating panel from "lg" up. */
 .dropdown-menu {
-	list-style: none;
-	margin: var(--space-1) 0 var(--space-1) var(--space-3);
-	padding: 0;
-	display: none;
+  list-style: none;
+  margin: var(--space-1) 0 var(--space-1) var(--space-3);
+  padding: 0;
+  display: none;
 }
 
 .dropdown-menu.is-open {
-	display: block;
+  display: block;
 }
 
 .dropdown-toggle {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: var(--space-1);
-	width: 100%;
-	border: 0;
-	background: none;
-	font: inherit;
-	text-align: inherit;
-	cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1);
+  width: 100%;
+  border: 0;
+  background: none;
+  /*
+	 * Deliberately not the `font` shorthand: it resets font-weight, and
+	 * .dropdown-toggle carries .nav-link too at equal specificity but later
+	 * in this file — so the shorthand silently undid .nav-link's
+	 * font-weight and left submenu toggles lighter than the links beside
+	 * them. List only the properties actually being normalised.
+	 */
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.nav-link--btn,
+.navbar-nav > .btn-nav > .nav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.5rem 0.9rem 0.35rem 0.9rem;
+  border: 1px solid var(--col-brand-green);
+  border-radius: 999px;
+  background-color: var(--col-brand-green);
+  color: var(--col-black);
+  font-size: 0.9rem;
+  font-weight: var(--fw-800);
+  line-height: 1;
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+  transition:
+    background-color var(--transition),
+    color var(--transition),
+    border-color var(--transition);
+
+  &:hover,
+  &:focus-visible {
+    background-color: color-mix(
+      in srgb,
+      var(--col-brand-green) 80%,
+      var(--col-white)
+    );
+    border-color: var(--col-brand-green);
+    color: var(--col-black);
+    outline: none;
+  }
+
+  &.active,
+  &[aria-current="page"] {
+    background-color: var(--col-brand-green);
+    border-color: var(--col-brand-green);
+    color: var(--col-black);
+  }
 }
 
 @media (min-width: 992px) {
-	.navbar-toggler {
-		display: none;
-	}
+  .navbar-toggler {
+    display: none;
+  }
 
-	.navbar-collapse,
-	.navbar-collapse.is-open {
-		display: block;
-		position: static;
-		width: auto;
-		max-height: none;
-		overflow-y: visible;
-		background: none;
-		border-top: 0;
-		box-shadow: none;
-		padding: 0;
-	}
+  .navbar-collapse,
+  .navbar-collapse.is-open {
+    display: block;
+    position: static;
+    width: auto;
+    max-height: none;
+    overflow-y: visible;
+    background: none;
+    border-top: 0;
+    box-shadow: none;
+    padding: 0;
+  }
 
-	.navbar-nav {
-		flex-direction: row;
-		margin: 0;
-	}
+  .navbar-nav {
+    flex-direction: row;
+    /* wider than the stacked mobile panel's --space-2: horizontal items
+		   need more separation than vertical ones to read as distinct */
+    gap: var(--space-4);
+    margin: 0;
+  }
 
-	.dropdown {
-		position: relative;
-	}
+  .dropdown {
+    position: relative;
+  }
 
-	.dropdown-menu {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		min-width: 10rem;
-		margin: 0;
-		padding: var(--space-2);
-		background-color: var(--col-body-bg);
-		border: 1px solid var(--col-grey-300);
-		border-radius: var(--radius-sm);
-		box-shadow: var(--shadow-lg);
-		z-index: 10;
-	}
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 10rem;
+    margin: 0;
+    padding: var(--space-2);
+    background-color: var(--col-body-bg);
+    border: 1px solid var(--col-grey-300);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+    z-index: 10;
+  }
 }

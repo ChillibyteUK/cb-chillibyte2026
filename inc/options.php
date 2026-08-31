@@ -12,10 +12,9 @@
  * (a fixed multi-image list, e.g. an accreditation badge row) and
  * `repeater` (genuinely repeating structured rows, e.g. a client-logo
  * list) — plus a generic tabs pattern once there are enough sections to
- * make one long scrolling page unwieldy. The example fields below
- * (`example_gallery`, `example_repeater`) exist to demonstrate both field
- * types working end to end; rename or replace them with real per-project
- * fields.
+ * make one long scrolling page unwieldy. `example_repeater` exists to
+ * demonstrate the repeater type working end to end; rename or replace it
+ * with real per-project fields.
  *
  * @package cb-chillibyte-2026
  */
@@ -66,63 +65,78 @@ function cb_chillibyte_2026_register_settings_page() {
 	add_settings_section( 'cb_chillibyte_2026_repeater', 'Repeater', '__return_false', 'theme-general-settings' );
 
 	$fields = array(
-		'email'                     => array(
+		'email'                    => array(
 			'label'   => 'Email',
 			'type'    => 'email',
 			'section' => 'cb_chillibyte_2026_general',
 		),
-		'phone'                     => array(
+		'phone'                    => array(
 			'label'   => 'Phone',
 			'type'    => 'text',
 			'section' => 'cb_chillibyte_2026_general',
 		),
-		'facebook_url'              => array(
+		'address'                  => array(
+			'label'   => 'Address',
+			'type'    => 'textarea',
+			'section' => 'cb_chillibyte_2026_general',
+		),
+		'contact_form'             => array(
+			'label'   => 'Contact Form Shortcode',
+			'type'    => 'text',
+			'section' => 'cb_chillibyte_2026_general',
+		),
+		'map_url'                  => array(
+			'label'   => 'Map URL',
+			'type'    => 'text',
+			'section' => 'cb_chillibyte_2026_general',
+		),
+		'facebook_url'             => array(
 			'label'       => 'Facebook URL',
 			'type'        => 'url',
 			'section'     => 'cb_chillibyte_2026_social',
 			'placeholder' => 'https://facebook.com/...',
 			'description' => 'Leave blank to hide this icon from [social_icons].',
 		),
-		'instagram_url'             => array(
+		'instagram_url'            => array(
 			'label'       => 'Instagram URL',
 			'type'        => 'url',
 			'section'     => 'cb_chillibyte_2026_social',
 			'placeholder' => 'https://instagram.com/...',
 			'description' => 'Leave blank to hide this icon from [social_icons].',
 		),
-		'ga_property'               => array(
+		'ga_property'              => array(
 			'label'       => 'GA Property',
 			'type'        => 'text',
 			'section'     => 'cb_chillibyte_2026_tracking',
 			'placeholder' => 'G-XXXXXXX',
 			'description' => 'Google Analytics measurement ID. Only fires for logged-out visitors.',
 		),
-		'gtm_property'              => array(
+		'gtm_property'             => array(
 			'label'       => 'GTM Property',
 			'type'        => 'text',
 			'section'     => 'cb_chillibyte_2026_tracking',
 			'placeholder' => 'GTM-XXXXXXX',
 			'description' => 'Google Tag Manager container ID. Only fires for logged-out visitors.',
 		),
-		'google_site_verification'  => array(
+		'google_site_verification' => array(
 			'label'       => 'Google Site Verification',
 			'type'        => 'text',
 			'section'     => 'cb_chillibyte_2026_tracking',
 			'description' => 'Content value of the google-site-verification meta tag.',
 		),
-		'bing_site_verification'    => array(
+		'bing_site_verification'   => array(
 			'label'       => 'Bing Site Verification',
 			'type'        => 'text',
 			'section'     => 'cb_chillibyte_2026_tracking',
 			'description' => 'Content value of the msvalidate.01 meta tag.',
 		),
-		'example_gallery'           => array(
-			'label'       => 'Example Gallery',
+		'awards_gallery'           => array(
+			'label'       => 'Awards Gallery',
 			'type'        => 'gallery',
 			'section'     => 'cb_chillibyte_2026_gallery',
-			'description' => 'A fixed multi-image list — e.g. accreditation badges, a logo strip. Read with cb_chillibyte_2026_get_repeater_setting-style helper of your own, mirroring cb_chillibyte_2026_get_footer_accreditation_ids() in the cb-hts-js-2026 sibling theme.',
+			'description' => 'Read with cb_chillibyte_2026_get_repeater_setting-style helper of your own, mirroring cb_chillibyte_2026_get_footer_accreditation_ids() in the cb-hts-js-2026 sibling theme.',
 		),
-		'example_repeater'          => array(
+		'example_repeater'         => array(
 			'label'       => 'Example Repeater',
 			'type'        => 'repeater',
 			'section'     => 'cb_chillibyte_2026_repeater',
@@ -170,6 +184,27 @@ function cb_chillibyte_2026_get_repeater_setting( $key ) {
 }
 
 /**
+ * Read a `gallery`-type setting as an array of attachment IDs.
+ *
+ * The field stores a CSV of IDs in selection order (see
+ * cb_chillibyte_2026_render_gallery_field()); this splits it back out,
+ * dropping anything non-numeric or zero so callers can pass the result
+ * straight to wp_get_attachment_image().
+ *
+ * @param string $key Setting key, e.g. 'awards_gallery'.
+ * @return int[]
+ */
+function cb_chillibyte_2026_get_gallery_setting( $key ) {
+	$value = cb_chillibyte_2026_get_setting( $key );
+
+	if ( ! is_string( $value ) || '' === $value ) {
+		return array();
+	}
+
+	return array_values( array_filter( array_map( 'absint', explode( ',', $value ) ) ) );
+}
+
+/**
  * Enqueue the media modal and settings-page admin scripts, settings page only.
  *
  * @param string $hook_suffix Current admin page hook.
@@ -206,8 +241,8 @@ function cb_chillibyte_2026_settings_page_assets( $hook_suffix ) {
 add_action( 'admin_enqueue_scripts', 'cb_chillibyte_2026_settings_page_assets' );
 
 /**
- * Render a single settings field — text/email/url input, a gallery picker,
- * or a generic repeater.
+ * Render a single settings field — text/email/url input, a textarea, a
+ * gallery picker, or a generic repeater.
  *
  * @param array $args Field args: key, type, placeholder, description.
  * @return void
@@ -223,6 +258,11 @@ function cb_chillibyte_2026_render_settings_field( $args ) {
 		return;
 	}
 
+	if ( 'textarea' === $args['type'] ) {
+		cb_chillibyte_2026_render_textarea_field( $args );
+		return;
+	}
+
 	$value = cb_chillibyte_2026_get_setting( $args['key'] );
 	?>
 	<input
@@ -233,6 +273,33 @@ function cb_chillibyte_2026_render_settings_field( $args ) {
 		placeholder="<?php echo esc_attr( $args['placeholder'] ?? '' ); ?>"
 		class="regular-text"
 	>
+	<?php
+	if ( ! empty( $args['description'] ) ) {
+		?>
+		<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
+		<?php
+	}
+}
+
+/**
+ * Render a `textarea`-type field — for multi-line values like a postal
+ * address. `<input type="textarea">` is not a real input type (browsers
+ * silently degrade it to a single-line `type="text"`), so this needs its
+ * own branch rather than falling through to the generic input above.
+ *
+ * @param array $args Field args: key, placeholder, description.
+ * @return void
+ */
+function cb_chillibyte_2026_render_textarea_field( $args ) {
+	$value = cb_chillibyte_2026_get_setting( $args['key'] );
+	?>
+	<textarea
+		id="<?php echo esc_attr( $args['key'] ); ?>"
+		name="<?php echo esc_attr( CB_CHILLIBYTE_2026_SETTINGS_OPTION ); ?>[<?php echo esc_attr( $args['key'] ); ?>]"
+		placeholder="<?php echo esc_attr( $args['placeholder'] ?? '' ); ?>"
+		rows="<?php echo (int) ( $args['rows'] ?? 4 ); ?>"
+		class="large-text"
+	><?php echo esc_textarea( $value ); ?></textarea>
 	<?php
 	if ( ! empty( $args['description'] ) ) {
 		?>

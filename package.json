@@ -1,7 +1,7 @@
 {
   "name": "cb-chillibyte-2026",
   "version": "1.0.0",
-  "description": "Standalone base WordPress theme. No parent theme, no Bootstrap — own lightweight CSS reusing Bootstrap-style naming.",
+  "description": "Standalone base WordPress theme. No parent theme, no Bootstrap \u2014 own lightweight CSS reusing Bootstrap-style naming.",
   "main": "index.js",
   "scripts": {
     "bs": "browser-sync start --config src/build/browser-sync.config.js",
@@ -17,15 +17,17 @@
     "watch-run-css": "nodemon --watch src/css/ --watch src/blocks/ --watch src/build/tokens.config.js --ignore src/css/utilities.css --ignore src/css/blocks.css --ext css,js --exec \"npm run css\"",
     "watch-run-js": "nodemon --watch src/js/ --ext js --exec \"npm run js\"",
     "watch-run-theme-json": "nodemon --watch src/css/tokens.css --exec \"npm run generate-theme-json\"",
-    "blocks:build": "wp-scripts build",
-    "blocks:start": "wp-scripts start",
+    "blocks:build": "npm run generate-hero-animations && wp-scripts build",
+    "blocks:start": "npm run generate-hero-animations && wp-scripts start",
+    "generate-hero-animations": "node src/build/generate-hero-animations.js",
     "dist": "npm-run-all --parallel css js blocks:build",
     "generate-theme-json": "node src/build/generate-theme-json.js",
     "add-block": "bash add_block.sh",
     "format": "npm-run-all format:*",
     "format:js": "prettier --write src/js/**/*.js",
     "format:css": "prettier --write src/css/**/*.css",
-    "format:json": "prettier --write ./**/*.json --ignore-path .prettierignore"
+    "format:json": "prettier --write ./**/*.json --ignore-path .prettierignore",
+    "watch-run-hero-animations": "nodemon --watch animation/json/ --ext json --exec \"npm run generate-hero-animations\""
   },
   "engines": {
     "node": ">=18"

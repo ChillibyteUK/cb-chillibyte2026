@@ -1,0 +1,76 @@
+{
+	"title": "CB Hero",
+	"color_support": false,
+	"fields": [
+		{
+			"label": "Is Homepage?",
+			"type": "checkbox",
+			"help": "",
+			"width": 50,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "isHomepage",
+			"snake": "is_homepage",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Animation",
+			"type": "select",
+			"help": "",
+			"width": 50,
+			"options": "bomb,heart,rocket,chat,trophy",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "animation",
+			"snake": "animation",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Hero Title",
+			"type": "textarea",
+			"help": "Wrap a word in <strong> to bold it, or <em> to underline it.",
+			"width": 100,
+			"options": "",
+			"textarea_style": "linebreak",
+			"link_target": false,
+			"name": "heroTitle",
+			"snake": "hero_title",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Subtitle",
+			"type": "text",
+			"help": "",
+			"width": 100,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "subtitle",
+			"snake": "subtitle",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "CTA",
+			"type": "link",
+			"help": "",
+			"width": 100,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": true,
+			"name": "cta",
+			"snake": "cta",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		}
+	]
+}

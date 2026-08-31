@@ -1,0 +1,73 @@
+.cb-text-quote__quote-wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-3);
+  /*
+   * Decorative accent bar — a two-column layout (content box + plain
+   * colour bar), not an offset/overlapping shadow, so a flex sibling is
+   * enough; no absolute positioning needed. ::after keeps it out of markup
+   * entirely, unlike the empty <div class="about-red"> this replaces on
+   * the old production site.
+   */
+  &::after {
+    content: "";
+    flex: 0 0 3rem;
+    background-color: var(--col-brand-red);
+  }
+}
+
+.cb-text-quote__quote-wrapper--plain {
+  display: block;
+
+  &::after {
+    content: none;
+  }
+}
+
+.cb-text-quote__quote {
+  flex: 1;
+  padding: var(--space-6) var(--space-5) var(--space-5) var(--space-5);
+  background-color: var(--col-brand-green);
+}
+
+.cb-text-quote__quote--plain {
+  padding: 0;
+  background-color: transparent;
+}
+
+.cb-text-quote__quote-icon {
+  display: block;
+  width: 3rem;
+  height: auto;
+  margin-bottom: var(--space-3);
+  fill: var(--col-blue);
+}
+
+.cb-text-quote__quote-icon-left,
+.cb-text-quote__quote-icon-right {
+  fill: var(--col-blue);
+}
+
+.cb-text-quote__quote--plain .cb-text-quote__quote-icon {
+  width: clamp(4.5rem, 8vw, 7rem);
+  margin-bottom: var(--space-4);
+}
+
+.cb-text-quote__quote--plain .cb-text-quote__quote-icon-left {
+  fill: var(--col-brand-green);
+}
+
+.cb-text-quote__quote--plain .cb-text-quote__quote-icon-right {
+  fill: var(--col-brand-red);
+}
+
+.cb-text-quote__quote-body {
+  font-weight: var(--fw-800);
+  line-height: var(--line-height-loose);
+}
+
+.cb-text-quote__quote--plain .cb-text-quote__quote-body {
+  color: var(--col-blue);
+  font-size: var(--fs-h4);
+  line-height: 1.35;
+}

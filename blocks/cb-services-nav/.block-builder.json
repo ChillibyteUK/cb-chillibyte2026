@@ -1,0 +1,34 @@
+{
+	"title": "CB Services Nav",
+	"color_support": false,
+	"fields": [
+		{
+			"label": "Title",
+			"type": "text",
+			"help": "Use <strong> and <em> to embolden and emphasise",
+			"width": 100,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "title",
+			"snake": "title",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Intro",
+			"type": "richtext",
+			"help": "",
+			"width": 100,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "intro",
+			"snake": "intro",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		}
+	]
+}

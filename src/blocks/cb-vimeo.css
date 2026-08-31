@@ -1,0 +1,24 @@
+.cb-vimeo__player {
+  /*
+   * iframe height:100% needs an ancestor with an explicit height to
+   * resolve against — without one it computes to nothing and the iframe
+   * falls back to its ~150px default. aspect-ratio gives this element a
+   * real height derived from its own width (whichever width the
+   * Full-width/Container size option produces), then the iframe is
+   * absolutely positioned to fill that box exactly.
+   *
+   * Scoped to this inner wrapper only, not the outer .cb-vimeo block
+   * wrapper — both used to share the "cb-vimeo" class, so the block
+   * wrapper also got an aspect-ratio-driven height on top of its child's,
+   * making the whole section render far taller than the video itself.
+   */
+  position: relative;
+  aspect-ratio: 16 / 9;
+
+  iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+}

@@ -1,0 +1,132 @@
+:root {
+  --bg: #050506;
+  --cell: 20px;
+  --gap: 2px;
+  --dur: 700ms;
+  --colour-1: #383947;
+  --colour-2: #212333;
+  --colour-blank: #212333;
+  --ease: cubic-bezier(0.22, 0.7, 0.32, 1);
+  /* starting point for the hero's height clamp - override per variant,
+     e.g. .hero--short { --hero-max-height: 420px } */
+  --hero-max-height: 800px;
+  /* every grid is standardised to 28x23 cells (see extract_grid.py) -
+     rows is a fixed constant now, not something only JS can know */
+  --grid-rows: 23;
+}
+
+/* hero box: clamps between 100vh and 700px tall, full width of its
+   parent (down to a floor so the shape stays legible on narrow mobile
+   viewports). the svg always fills this box completely from first
+   paint (see svg.grid below) - it right-aligns and scales its actual
+   content internally via preserveAspectRatio, so there's no intrinsic-
+   size dependency on JS having run yet, and therefore no load-in jump. */
+.grid-container {
+  position: relative;
+  width: 100%;
+  min-width: 220px;
+  height: min(100vh, var(--hero-max-height));
+  overflow: hidden;
+  background-color: var(--colour-blank);
+  /* cheap "empty cell" filler: two repeating gradients drawing the gap
+     lines, no image request, no extra DOM. cell size is derived with
+     the exact same formula as the container's own height, so it's
+     correct from the very first paint - no JS, no resize listener,
+     no load-in size jump. */
+  --bg-cell: calc(min(100vh, var(--hero-max-height)) / var(--grid-rows));
+  background-image:
+    linear-gradient(
+      to right,
+      var(--bg) 0 var(--gap),
+      transparent var(--gap) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      var(--bg) 0 var(--gap),
+      transparent var(--gap) 100%
+    );
+  background-size: var(--bg-cell) var(--bg-cell);
+  /* tile from the top-right corner - right because that's where the
+     real grid sits (so any partial/cut-off cell lands on the far
+     left, not at the seam), top because row 0 of the real grid starts
+     at the top, not vertically centered */
+  background-position: right top;
+}
+
+svg.grid {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* no background here - let the container's tiled pattern show
+     through underneath: both behind real cells' antialiased gaps, and
+     in the letterboxed space preserveAspectRatio="xMaxYMid meet"
+     (set in reveal.js) leaves to the left of the actual shape */
+}
+
+/* one rect per lit cell. no nested faces, no box-shadow: just
+   opacity + transform + fill, all cheap for the compositor. */
+.cell {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-duration: var(--dur);
+  animation-timing-function: var(--ease);
+  animation-fill-mode: both;
+  animation-delay: var(--delay, 0ms);
+  animation-name: reveal;
+}
+
+.cell.value-0 {
+  --target: var(--colour-blank);
+}
+.cell.value-1 {
+  --target: var(--colour-1);
+}
+.cell.value-2 {
+  --target: var(--colour-2);
+}
+
+/* smooth, single settle: modern LED-panel feel */
+@keyframes reveal {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+    fill: var(--colour-blank);
+  }
+  55% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    fill: var(--target);
+  }
+}
+
+/* "always visible" mode: every cell is already sitting there at full
+   opacity as a blank tile - only its fill colour animates, so there's
+   no initial wave of cells fading/scaling into existence. */
+.grid.always-visible .cell {
+  opacity: 1;
+  animation-name: reveal-colour;
+}
+
+@keyframes reveal-colour {
+  0% {
+    opacity: 1;
+    fill: var(--colour-blank);
+  }
+  100% {
+    opacity: 1;
+    fill: var(--target);
+  }
+}
+
+/* shuffle variants are generated per-play in JS (random step count,
+   random offsets, random colours) and injected as their own
+   @keyframes rules - see reveal.js buildShuffleVariants(). each cell
+   is assigned one variant name via inline style, so no two cells
+   necessarily flicker the same way. */

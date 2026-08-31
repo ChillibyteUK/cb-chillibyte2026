@@ -1,0 +1,62 @@
+{
+	"title": "CB Text Image",
+	"color_support": true,
+	"fields": [
+		{
+			"label": "Title",
+			"type": "textarea",
+			"help": "Wrap a word in <strong> to bold it, or <em> to underline it.",
+			"width": 100,
+			"options": "",
+			"textarea_style": "linebreak",
+			"link_target": false,
+			"name": "title",
+			"snake": "title",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Content",
+			"type": "richtext",
+			"help": "",
+			"width": 100,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "content",
+			"snake": "content",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "CTA",
+			"type": "link",
+			"help": "",
+			"width": 100,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": true,
+			"name": "cta",
+			"snake": "cta",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Image",
+			"type": "image",
+			"help": "",
+			"width": 100,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "image",
+			"snake": "image",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		}
+	]
+}

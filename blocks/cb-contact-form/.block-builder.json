@@ -1,0 +1,48 @@
+{
+	"title": "CB Contact Form",
+	"color_support": true,
+	"fields": [
+		{
+			"label": "Title",
+			"type": "textarea",
+			"help": "Use <strong> and <em> to embolden and emphasise",
+			"width": 100,
+			"options": "",
+			"textarea_style": "linebreak",
+			"link_target": false,
+			"name": "title",
+			"snake": "title",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Show Address",
+			"type": "checkbox",
+			"help": "",
+			"width": 50,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "showAddress",
+			"snake": "show_address",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Form Shortcode",
+			"type": "text",
+			"help": "",
+			"width": 50,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "formShortcode",
+			"snake": "form_shortcode",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		}
+	]
+}

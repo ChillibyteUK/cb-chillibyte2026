@@ -1,0 +1,72 @@
+/*
+ * Extracted from the production site's cb-theme.css (.plane rules). Scoped
+ * to .cb-title-anim--plane instead of the original bare .plane, so it can't
+ * collide with unrelated ".plane" class usage elsewhere. The SVG's internal
+ * IDs (#ecXhK1QvfRn1 etc.) are generator-assigned and specific to this
+ * export — kept as-is since renaming them would mean rewriting every
+ * keyframe/selector reference below by hand.
+ *
+ * Two states: on load, the plane animates from the SVG's raw exported
+ * position into a resting position (the "settle" keyframes). On hover, it
+ * animates further along the same path (the "fly" keyframes). Removing
+ * hover re-triggers the settle keyframes automatically — that's a plain
+ * CSS :hover fallback, no JS needed to reverse it.
+ */
+
+.cb-title-anim--plane {
+	max-width: 450px;
+	width: 100%;
+}
+
+.cb-title-anim--plane #ecXhK1QvfRn1 #ecXhK1QvfRn3_to {
+	animation: cb-plane-settle-to 2000ms linear 1 normal forwards;
+}
+.cb-title-anim--plane #ecXhK1QvfRn1 #ecXhK1QvfRn3_tr {
+	animation: cb-plane-settle-tr 2000ms linear 1 normal forwards;
+}
+.cb-title-anim--plane #ecXhK1QvfRn1 #ecXhK1QvfRn16 {
+	animation: cb-plane-settle-op 2000ms linear 1 normal forwards;
+}
+
+.cb-title-anim--plane:hover #ecXhK1QvfRn1 #ecXhK1QvfRn3_to {
+	animation: cb-plane-fly-to 2000ms linear 1 normal forwards;
+}
+.cb-title-anim--plane:hover #ecXhK1QvfRn1 #ecXhK1QvfRn3_tr {
+	animation: cb-plane-fly-tr 2000ms linear 1 normal forwards;
+}
+.cb-title-anim--plane:hover #ecXhK1QvfRn1 #ecXhK1QvfRn16 {
+	animation: cb-plane-fly-op 2000ms linear 1 normal forwards;
+}
+
+@keyframes cb-plane-settle-to {
+	0% { transform: translate(162.142px, -51.364px); }
+	25% { transform: translate(-76.495775px, 3.692384px); }
+	100% { transform: translate(-76.495775px, 3.692384px); }
+}
+@keyframes cb-plane-settle-tr {
+	0% { transform: rotate(14.000002deg); }
+	25% { transform: rotate(0.338898deg); }
+	100% { transform: rotate(0.338898deg); }
+}
+@keyframes cb-plane-settle-op {
+	0% { opacity: 1; }
+	10% { opacity: 0; }
+	100% { opacity: 0; }
+}
+
+@keyframes cb-plane-fly-to {
+	0% { transform: translate(-76.495775px, 3.692384px); animation-timing-function: cubic-bezier(0, 0, 0.58, 1); }
+	25% { transform: translate(162.142px, -51.364px); }
+	100% { transform: translate(162.142px, -51.364px); }
+}
+@keyframes cb-plane-fly-tr {
+	0% { transform: rotate(0.338898deg); animation-timing-function: cubic-bezier(0, 0, 0.58, 1); }
+	25% { transform: rotate(14.000002deg); }
+	100% { transform: rotate(14.000002deg); }
+}
+@keyframes cb-plane-fly-op {
+	0% { opacity: 0; }
+	10% { opacity: 0; }
+	45% { opacity: 1; }
+	100% { opacity: 1; }
+}

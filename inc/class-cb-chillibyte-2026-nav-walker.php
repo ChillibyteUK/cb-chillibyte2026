@@ -64,7 +64,13 @@ if ( ! class_exists( 'CB_Chillibyte_2026_Nav_Walker' ) ) {
 			$has_children = in_array( 'menu-item-has-children', $item->classes, true );
 			$is_current   = in_array( 'current-menu-item', $item->classes, true );
 
-			$li_classes = array( 'nav-item' );
+			$custom_li_classes = array();
+			foreach ( (array) $item->classes as $cls ) {
+				if ( in_array( $cls, array( 'btn-nav', 'nav-link--btn', 'btn' ), true ) ) {
+					$custom_li_classes[] = $cls;
+				}
+			}
+			$li_classes = array_merge( array( 'nav-item' ), $custom_li_classes );
 			if ( $has_children ) {
 				$li_classes[] = 'dropdown';
 			}
@@ -80,6 +86,14 @@ if ( ! class_exists( 'CB_Chillibyte_2026_Nav_Walker' ) ) {
 				$output                  .= '</button>';
 			} else {
 				$link_classes = array( 'nav-link' );
+				foreach ( (array) $item->classes as $cls ) {
+					if ( 'nav-link--btn' === $cls || 'btn' === $cls ) {
+						$link_classes[] = $cls;
+					}
+				}
+				if ( in_array( 'btn-nav', $item->classes, true ) ) {
+					$link_classes[] = 'nav-link--btn';
+				}
 				if ( $is_current ) {
 					$link_classes[] = 'active';
 				}

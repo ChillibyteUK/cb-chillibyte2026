@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "cb-chillibyte-2026/cb-review-slider",
+	"title": "CB Review Slider",
+	"category": "cb-chillibyte-2026",
+	"icon": "cover-image",
+	"attributes": {
+		"title": {
+			"type": "string",
+			"default": ""
+		},
+		"brbShortcode": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"className": true,
+		"align": true
+	},
+	"editorScript": "file:./build/index.js",
+	"render": "file:./render.php"
+}

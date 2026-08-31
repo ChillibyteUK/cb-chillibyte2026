@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "cb-chillibyte-2026/cb-service-details",
+  "title": "CB Service Details",
+  "category": "cb-chillibyte-2026",
+  "icon": "list-view",
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": ""
+    },
+    "intro": {
+      "type": "string",
+      "default": ""
+    },
+    "items": {
+      "type": "array",
+      "default": []
+    }
+  },
+  "supports": {
+    "anchor": true,
+    "className": true,
+    "align": true,
+    "color": {
+      "background": true,
+      "text": true
+    }
+  },
+  "editorScript": "file:./build/index.js",
+  "render": "file:./render.php"
+}

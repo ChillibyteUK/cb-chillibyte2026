@@ -1,0 +1,96 @@
+/*
+ * Non-homepage heroes are short. --hero-max-height is declared on :root in
+ * animation/css/reveal.css and read by .grid-container for both its height
+ * and its background-gradient cell size, so overriding just the custom
+ * property keeps those two in step — restating the height calc here instead
+ * would leave the tiled filler sized for the old height and no longer
+ * aligned with the real cells.
+ */
+.cb-hero--short {
+  --hero-max-height: 420px;
+}
+
+/*
+ * Below md the container is far narrower than the grid's 560x460 ratio, so
+ * fitting by width (the default xMaxYMid meet behaviour) would shrink the
+ * shape to a thin band with dead space above and below. Instead give the
+ * svg box the viewBox's own aspect ratio at full container height: "meet"
+ * then has nothing to letterbox, the svg overflows horizontally, and
+ * .grid-container's existing overflow:hidden crops it. Centring is what
+ * makes that crop symmetrical — without it the right-anchored default would
+ * cut the whole shape off one side.
+ *
+ * 768px is the md breakpoint from src/build/tokens.config.js, hardcoded
+ * because a custom property can't be read inside an @media condition — same
+ * constraint as src/css/nav.css. Keep in sync with that file.
+ */
+@media (max-width: 767.98px) {
+  .cb-hero svg.grid {
+    /*
+     * Same expression .grid-container uses for its own height, so the two
+     * track together off one --hero-max-height. Width is stated explicitly
+     * from it rather than left to `width: auto` + `aspect-ratio` — an
+     * absolutely positioned inline <svg> shrink-to-fits to its containing
+     * block instead of deriving width from the ratio, which silently
+     * produced no overflow and therefore no crop at all.
+     */
+    --grid-h: min(100vh, var(--hero-max-height));
+
+    inset: 0 auto 0 50%;
+    width: calc(var(--grid-h) * 560 / 460);
+    /*
+     * src/css/base.css gives every svg max-width: 100%, which clamps the
+     * calc above straight back to the container's width — the overflow this
+     * whole rule depends on quietly disappears without this line.
+     */
+    max-width: none;
+    height: var(--grid-h);
+    transform: translateX(-50%);
+  }
+}
+
+.cb-hero {
+  display: grid;
+  grid-template-areas: "hero";
+  isolation: isolate;
+
+  color: var(--col-white);
+  background-color: var(--col-black);
+
+  .grid-container {
+    grid-area: hero;
+    z-index: 0;
+  }
+  .hero-content {
+    grid-area: hero;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    font-size: var(--fs-xl);
+  }
+
+  h1 {
+    font-size: var(--fs-hero);
+    line-height: var(--line-height-heading);
+    font-weight: var(--fw-200);
+    color: var(--col-white);
+  }
+
+  /*
+   * Typewriter reveal (see view.js). .cb-hero-title starts hidden so there's
+   * no flash of the full, unsplit heading before JS wraps it into per-char
+   * spans — view.js flips it back to visible the instant wrapping is done
+   * (synchronously, before the stagger animation starts), so what's actually
+   * hidden the whole time is just the individual .cb-hero-char spans. If
+   * gsap fails to load, view.js reveals the title instantly instead of
+   * leaving it hidden.
+   */
+  .cb-hero-title {
+    opacity: 0;
+  }
+  .cb-hero-char {
+    opacity: 0;
+  }
+}

@@ -1,0 +1,10 @@
+/*
+ * Typekit kit CSS — one @import brings in every @font-face (all weights/
+ * styles) registered in the kit, rather than hand-copying individual
+ * @font-face blocks per weight (fragile, easy to miss one). Kit ID oiz1cxz
+ * is the same one live on chillibyte.co.uk (b5st-main theme's cb-theme.css) —
+ * confirmed to include articulat-cf (weights 200/300/800). The kit also has
+ * a separate articulat-heavy-cf (weight 900) family, unused on this project.
+ */
+
+@import url("https://use.typekit.net/oiz1cxz.css");

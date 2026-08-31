@@ -1,0 +1,44 @@
+/*
+ * data-reveal — see src/js/reveal.js for the JS half. Any element with
+ * this attribute starts hidden/offset; reveal.js's global
+ * IntersectionObserver auto-animates it in on scroll, unless it also has
+ * data-reveal-manual, in which case a block's own view.js triggers it
+ * instead via window.cbReveal(el) — see blocks/cb-hero/view.js for the
+ * manual-trigger usage (waits for the hero's typewriter to finish first).
+ */
+[data-reveal] {
+	opacity: 0;
+	transform: translateY(1.5rem);
+}
+
+/*
+ * Variants on the default "up from below". reveal.js animates x, y and
+ * scale all back to their resting values, so the only thing deciding how an
+ * element travels is the start state declared here — adding another variant
+ * needs no JS change.
+ */
+[data-reveal][data-reveal-from="right"] {
+	transform: translateX(2.5rem);
+}
+
+[data-reveal][data-reveal-from="left"] {
+	transform: translateX(-2.5rem);
+}
+
+/*
+ * Scales up into place instead of moving. Safe on anything whose box is
+ * already reserved — a transform is compositor-only and never reflows, so
+ * this cannot introduce layout shift no matter what it's applied to.
+ * Shallow on purpose: past ~0.9 the growth stops reading as a settle and
+ * starts reading as a pop.
+ */
+[data-reveal][data-reveal-from="zoom"] {
+	transform: scale(0.93);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	[data-reveal] {
+		opacity: 1;
+		transform: none;
+	}
+}

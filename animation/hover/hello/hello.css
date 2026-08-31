@@ -1,0 +1,63 @@
+/*
+ * Extracted from the production site's cb-theme.css (.hello rules). Scoped
+ * to .cb-title-anim--hello — the class get_title_animation()'s caller wraps
+ * the inlined SVG in — instead of the original bare .hello, so it can't
+ * collide with unrelated ".hello" class usage elsewhere. The SVG's internal
+ * IDs (#eJZro68LbfV3 etc.) are generator-assigned and specific to this
+ * export — kept as-is since renaming them would mean rewriting every
+ * selector below by hand.
+ *
+ * Unlike plane.css, this is a pure transition crossfade rather than a
+ * keyframe animation: two hand states swap opacity while the arm rotates
+ * from -20deg to rest, and mouse-out reverses all of it for free with no
+ * second set of rules.
+ *
+ * The production stylesheet also carries a keyframe-based variant of this
+ * same effect, but every one of its selectors is misspelled ".helllo"
+ * (three Ls), so none of it has ever matched an element. The transition
+ * rules below are what actually runs on the live site, so they're what's
+ * reproduced here — the dead keyframes are deliberately not ported.
+ *
+ * Sizing is the intrinsic max-width only. The production rule also carried
+ * `margin-left: 30px` (zeroed below 992px), which was positioning for that
+ * site's form section — leave spacing to whichever block places this.
+ */
+
+.cb-title-anim--hello {
+	max-width: 340px;
+	width: 100%;
+}
+
+.cb-title-anim--hello #eJZro68LbfV3,
+.cb-title-anim--hello #eJZro68LbfV8,
+.cb-title-anim--hello #eJZro68LbfV15_tr {
+	transition: 0.5s;
+}
+
+/* Waving hand — hidden at rest, faded in on hover. */
+.cb-title-anim--hello #eJZro68LbfV3 {
+	opacity: 0;
+}
+.cb-title-anim--hello:hover #eJZro68LbfV3 {
+	opacity: 1;
+}
+
+/* Resting hand — the inverse, faded out as the wave takes over. */
+.cb-title-anim--hello #eJZro68LbfV8 {
+	opacity: 1;
+}
+.cb-title-anim--hello:hover #eJZro68LbfV8 {
+	opacity: 0;
+}
+
+/*
+ * Arm rotation. The translate is the SVG export's own origin offset and
+ * must stay on both states — dropping it from either one makes the arm
+ * jump across the canvas rather than pivot in place.
+ */
+.cb-title-anim--hello #eJZro68LbfV15_tr {
+	transform: translate(118.16082px, 218.141384px) rotate(-20deg);
+}
+.cb-title-anim--hello:hover #eJZro68LbfV15_tr {
+	transform: translate(118.16082px, 218.141384px) rotate(0deg);
+}

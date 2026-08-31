@@ -26,8 +26,9 @@ function cb_chillibyte_2026_setup() {
 	// Rename/extend per project.
 	register_nav_menus(
 		array(
-			'primary' => __( 'Primary Menu', 'cb-chillibyte-2026' ),
-			'footer'  => __( 'Footer Menu', 'cb-chillibyte-2026' ),
+			'primary'  => __( 'Primary Menu', 'cb-chillibyte-2026' ),
+			'footer'   => __( 'Footer Menu', 'cb-chillibyte-2026' ),
+			'colophon' => __( 'Colophon Menu', 'cb-chillibyte-2026' ),
 		)
 	);
 }

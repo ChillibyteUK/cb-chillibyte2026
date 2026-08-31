@@ -1,0 +1,13 @@
+.cb-awards-strip {
+  ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+  li {
+    list-style: none;
+    display: flex;
+    align-items: center;
+  }
+}

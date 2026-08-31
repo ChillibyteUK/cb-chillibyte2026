@@ -10,9 +10,10 @@
 :root {
   /* Colour palette — rename/replace per project, keep the slug shape */
   --col-white: #ffffff;
-  --col-black: #000000;
+  --col-black: #404042;
   --col-grey-100: #f5f5f5;
   --col-grey-300: #d9d9d9;
+  --col-grey-600: #6a6a6a;
   --col-grey-700: #4a4a4a;
   --col-blue-700: #1d4ed8;
 
@@ -20,29 +21,64 @@
   --col-body: var(--col-black);
   --col-body-bg: var(--col-white);
 
+  --col-brand-green: #8dc53e;
+  --col-brand-red: #ed1b24;
+
+  --col-beige: #f4f2ed;
+  --col-beige-dk: #ece8df;
+  --col-blue: #313341;
+
   /* Type scale */
-  --font-family-base: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --fs-base: 1rem;
-  --fs-h1: clamp(2rem, 1.6rem + 2vw, 3rem);
-  --fs-h2: clamp(1.6rem, 1.35rem + 1.25vw, 2.25rem);
-  --fs-h3: clamp(1.3rem, 1.15rem + 0.75vw, 1.75rem);
-  --fs-h4: 1.25rem;
-  --fs-h5: 1.1rem;
-  --fs-h6: 1rem;
+  --font-family-base:
+    "articulat-cf", monospace, system-ui, -apple-system, "Segoe UI", Roboto,
+    sans-serif;
+  --fs-tiny: 0.75rem;
   --fs-small: 0.875rem;
-  --fw-400: 400;
-  --fw-600: 600;
-  --fw-700: 700;
+  --fs-base: 1rem;
+  --fs-lg: 1.125rem;
+  --fs-xl: 1.4rem;
+
+  /*
+   * Fluid type scale — each clamp() is derived from that size's own
+   * min/max via the standard fluid-type formula:
+   *   slope = (max - min) / (maxViewport - minViewport)
+   *   intercept = (min - slope * minViewport) / 16
+   * using minViewport 400px / maxViewport 1320px (the latter matches
+   * --container-max-width below, so type stops growing exactly when the
+   * layout does). Don't copy a neighbouring size's preferred value when
+   * adding a new step — it has to be recalculated from that step's own
+   * min/max or the interpolation is wrong (this is exactly the bug
+   * --fs-hero and --fs-h1 used to have: identical "1.6rem + 2vw" slopes
+   * despite different min/max).
+   *
+   * h1 -> h2 is an exact 1.25x step (major third) on both min and max
+   * (2 -> 1.6, 4 -> 3.2) — h3-h6 continue that same ratio, floored at
+   * 1rem once a step's min would otherwise drop below body text size.
+   * --fs-hero is a one-off display size outside this ratio, for hero
+   * sections only, not part of the h1-h6 hierarchy.
+   */
+  --fs-hero: clamp(3rem, 2.35rem + 2.61vw, 4.5rem);
+  --fs-h1: clamp(2rem, 1.13rem + 3.48vw, 4rem);
+  --fs-h2: clamp(1.6rem, 0.9rem + 2.78vw, 3.2rem);
+  --fs-h3: clamp(1.3rem, 0.78rem + 2.09vw, 2.5rem);
+  --fs-h4: clamp(1.1rem, 0.71rem + 1.57vw, 2rem);
+  --fs-h5: clamp(1rem, 0.74rem + 1.04vw, 1.6rem);
+  --fs-h6: clamp(1rem, 0.87rem + 0.52vw, 1.3rem);
+
+  --fw-200: 200;
+  --fw-300: 300;
+  --fw-800: 800;
 
   /* Semantic aliases — generate-utilities.js emits a matching .fw-* class
 	   for every custom property here, so these are free utility classes too
 	   (.fw-normal, .fw-semibold, .fw-bold), not just tokens for use in CSS. */
-  --fw-normal: var(--fw-400);
-  --fw-semibold: var(--fw-600);
-  --fw-bold: var(--fw-700);
+  --fw-normal: var(--fw-200);
+  --fw-semibold: var(--fw-300);
+  --fw-bold: var(--fw-800);
 
-  --line-height-base: 1.5;
+  --line-height-base: 1.6;
   --line-height-heading: 1.2;
+  --line-height-loose: 1.8;
 
   /* Spacing scale — used by both hand-authored CSS and the utility generator */
   --space-0: 0;
@@ -51,13 +87,14 @@
   --space-3: 1rem;
   --space-4: 1.5rem;
   --space-5: 3rem;
+  --space-6: 5rem;
 
   /* Radii / shadows / motion */
   --radius-sm: 0.25rem;
   --radius-lg: 0.5rem;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.08);
   --shadow-lg: 0 8px 24px rgb(0 0 0 / 0.12);
-  --transition: 150ms ease-in-out;
+  --transition: 150ms ease;
 
   /* Layout */
   --container-max-width: 1320px;

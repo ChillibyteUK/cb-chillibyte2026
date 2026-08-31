@@ -1,0 +1,48 @@
+{
+	"title": "CB Blog Cards",
+	"color_support": true,
+	"fields": [
+		{
+			"label": "Title",
+			"type": "textarea",
+			"help": "Use <strong> and <em> to embolden and emphasise",
+			"width": 100,
+			"options": "",
+			"textarea_style": "linebreak",
+			"link_target": false,
+			"name": "title",
+			"snake": "title",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Post Count",
+			"type": "number",
+			"help": "Defaults to 3",
+			"width": 50,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "postCount",
+			"snake": "post_count",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		},
+		{
+			"label": "Show Filters",
+			"type": "checkbox",
+			"help": "",
+			"width": 50,
+			"options": "",
+			"textarea_style": "paragraph",
+			"link_target": false,
+			"name": "showFilters",
+			"snake": "show_filters",
+			"sub_fields": [],
+			"repeater_layout": "row",
+			"post_type_slug": ""
+		}
+	]
+}

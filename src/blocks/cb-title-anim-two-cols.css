@@ -1,0 +1,8 @@
+.cb-title-anim-two-cols__title-container {
+  display: flex;
+  justify-content: space-between;
+
+  h2 {
+    max-width: 760px;
+  }
+}
