@@ -38,8 +38,19 @@ if ( empty( $btitle ) && empty( $intro ) && ! $people->have_posts() ) {
 		}
 
 		if ( $people->have_posts() ) {
+			/*
+			 * [data-reveal-rows], not [data-reveal-container] — see the header
+			 * of src/js/reveal.js. A container triggers as one unit on its own
+			 * entry, which only reads correctly for a group that fits on
+			 * screen; this grid never does (~2,700px four-up, ~11,000px stacked
+			 * one-up), so it used to animate all 20 cards the moment the grid's
+			 * top edge appeared and everything below the fold was already faded
+			 * in by the time you reached it. Rows mode observes each card
+			 * separately, so a row animates as you scroll to it, and still
+			 * staggers left-to-right across that row.
+			 */
 			?>
-			<div class="row cb-team-cards__grid" data-reveal-container data-reveal-stagger="0.08">
+			<div class="row cb-team-cards__grid" data-reveal-rows data-reveal-stagger="0.08">
 			<?php
 			while ( $people->have_posts() ) {
 				$people->the_post();
