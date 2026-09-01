@@ -30,18 +30,12 @@ function cb_chillibyte_2026_preload_fonts() {
 }
 add_action( 'wp_head', 'cb_chillibyte_2026_preload_fonts', 1 );
 
-/**
- * Preconnect to Typekit's font host. Only relevant on the (occasional)
- * project that loads a font via Typekit's raw @font-face URLs instead of
- * the usual local /fonts .woff2 files — remove this if the project drops
- * Typekit again.
- *
- * @return void
+/*
+ * The Typekit preconnect that used to sit here is gone: this project now
+ * self-hosts its webfont (Archivo, see src/css/fonts.css), so there is no
+ * third-party font origin left to warm up and the preload above covers it.
+ * Re-add a preconnect only if a project genuinely goes back to a hosted kit.
  */
-function cb_chillibyte_2026_preconnect_typekit() {
-	echo '<link rel="preconnect" href="https://use.typekit.net" crossorigin>' . "\n";
-}
-add_action( 'wp_head', 'cb_chillibyte_2026_preconnect_typekit', 1 );
 
 /**
  * GA/GTM tags and search-engine verification meta — all read from the

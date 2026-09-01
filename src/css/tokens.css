@@ -29,9 +29,27 @@
   --col-blue: #313341;
 
   /* Type scale */
+  /* "Archivo" is the self-hosted variable face declared in fonts.css.
+     `monospace` used to sit second in this stack, so any failure to load the
+     webfont dropped the site to a monospace fallback rather than a sans one —
+     removed along with the Typekit switch. */
   --font-family-base:
-    "articulat-cf", monospace, system-ui, -apple-system, "Segoe UI", Roboto,
-    sans-serif;
+    "Archivo", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Archivo's wdth axis, applied on body in base.css and inherited. Valid
+     range is 62%-125% (see the font-stretch descriptor in fonts.css); values
+     outside it clamp. 100% is the font's natural width and already sets
+     narrower than Manrope or Inter — go down from here to tighten further.
+     This is the dial to turn for width, in preference to tracking. */
+  --font-width: 100%;
+
+  /* Global tracking, applied on body in base.css and inherited from there.
+     Was a hardcoded +0.01em tuned for articulat-cf; it stayed positive
+     through the font switch and made things read loose. `normal` lets the
+     face's own metrics stand. Reach for --font-width first — narrowing the
+     letterforms holds up far better than negative tracking, which just
+     closes the gaps between them. */
+  --tracking-base: normal;
   --fs-tiny: 0.75rem;
   --fs-small: 0.875rem;
   --fs-base: 1rem;
@@ -59,11 +77,11 @@
    */
   --fs-hero: clamp(3rem, 2.35rem + 2.61vw, 4.5rem);
   --fs-h1: clamp(2rem, 1.13rem + 3.48vw, 4rem);
-  --fs-h2: clamp(1.6rem, 0.9rem + 2.78vw, 3.2rem);
-  --fs-h3: clamp(1.3rem, 0.78rem + 2.09vw, 2.5rem);
-  --fs-h4: clamp(1.1rem, 0.71rem + 1.57vw, 2rem);
-  --fs-h5: clamp(1rem, 0.74rem + 1.04vw, 1.6rem);
-  --fs-h6: clamp(1rem, 0.87rem + 0.52vw, 1.3rem);
+  --fs-h2: clamp(2.4rem, 2.05rem + 1.39vw, 3.2rem);
+  --fs-h3: clamp(2.4rem, 2.36rem + 0.17vw, 2.5rem);
+  --fs-h4: clamp(2rem, 2rem + 0vw, 2rem);
+  --fs-h5: clamp(1.6rem, 1.6rem + 0vw, 1.6rem);
+  --fs-h6: clamp(1.3rem, 1.3rem + 0vw, 1.3rem);
 
   --fw-200: 200;
   --fw-300: 300;

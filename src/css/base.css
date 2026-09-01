@@ -15,7 +15,8 @@ body {
   font-family: var(--font-family-base);
   font-size: var(--fs-base);
   font-weight: var(--fw-300);
-  letter-spacing: 0.01em;
+  font-stretch: var(--font-width);
+  letter-spacing: var(--tracking-base);
   line-height: var(--line-height-base);
   color: var(--col-body);
   background-color: var(--col-body-bg);

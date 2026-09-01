@@ -1,10 +1,44 @@
 /*
- * Typekit kit CSS — one @import brings in every @font-face (all weights/
- * styles) registered in the kit, rather than hand-copying individual
- * @font-face blocks per weight (fragile, easy to miss one). Kit ID oiz1cxz
- * is the same one live on chillibyte.co.uk (b5st-main theme's cb-theme.css) —
- * confirmed to include articulat-cf (weights 200/300/800). The kit also has
- * a separate articulat-heavy-cf (weight 900) family, unused on this project.
+ * Archivo, self-hosted. Replaces the Typekit kit (articulat-cf, kit oiz1cxz)
+ * that used to be pulled in here with an @import.
+ *
+ * Why the switch away from Typekit: Adobe's licence forbids self-hosting, so
+ * the kit could only ever be loaded cross-origin, and being an @import
+ * *inside* this stylesheet put it behind the theme CSS in the critical path —
+ * the browser had to download and parse theme.min.css before it could even
+ * discover the kit URL, then parse that before discovering the font URLs.
+ * Four serial round trips before the first font byte, all render-blocking,
+ * plus two extra DNS/TLS handshakes. Adobe also served every face as
+ * font-display:auto (= block), which is the "text remains invisible during
+ * webfont load" Lighthouse audit.
+ *
+ * Why Archivo specifically: articulat-cf sets fairly narrow, and the two
+ * obvious OFL substitutes don't. Measured on the same string at 100px/300,
+ * Manrope came out at 1773 and Inter at 1822 — Inter is actually the *wider*
+ * of the two, despite the reputation, with a cap height and x-height within
+ * 2% of Manrope's. Archivo is 1687 at its default width, and carries a real
+ * wdth axis (62-125) on top, so narrowness is a dial rather than a guess.
+ *
+ * Both axes are exposed the high-level way: font-weight drives wght as
+ * normal, and the font-stretch range below lets --font-width (tokens.css)
+ * drive wdth via a plain percentage, no font-variation-settings needed.
+ *
+ * Note that inc/head-tags.php preloads fonts/*.woff2 indiscriminately, so
+ * only the face actually in use belongs in that directory — a spare .woff2
+ * left alongside it gets fetched at high priority on every page and never
+ * used. Keep trial fonts out of fonts/ (a subdirectory is enough; the glob
+ * is not recursive) or delete them.
+ *
+ * The file is the latin "standard" (wght + wdth) build from
+ * @fontsource-variable/archivo. Swapping subsets is a drop-in: replace the
+ * .woff2 and the preload follows.
  */
 
-@import url("https://use.typekit.net/oiz1cxz.css");
+@font-face {
+	font-family: "Archivo";
+	src: url("../fonts/archivo-variable.woff2") format("woff2");
+	font-weight: 100 900;
+	font-stretch: 62% 125%;
+	font-style: normal;
+	font-display: swap;
+}
