@@ -23,21 +23,53 @@ function cb_chillibyte_2026_enqueue_styles() {
 add_action( 'wp_enqueue_scripts', 'cb_chillibyte_2026_enqueue_styles' );
 
 /**
+ * Enqueue a file from js/vendor/, filemtime-versioned like everything else.
+ *
+ * Third-party libraries are vendored into js/vendor/ and committed, the same
+ * convention the compiled css/ and js/ output already follows. They used to
+ * be loaded from jsdelivr/unpkg, which cost three extra DNS/TLS handshakes
+ * and put lenis.css in the render-blocking critical path on a third-party
+ * origin; serving them from this origin removes both.
+ *
+ * Vendored by hand rather than tracked in package.json, so the upstream
+ * version of each is recorded here — check this before replacing a file:
+ *   gsap.min.js             3.12.7  cdn.jsdelivr.net/npm/gsap
+ *   lenis.min.js, lenis.css 1.3.11  unpkg.com/lenis
+ *   rough-notation.iife.js  0.5.1   cdn.jsdelivr.net/npm/rough-notation
+ *
+ * @param string $handle Handle to register under.
+ * @param string $file   Filename within js/vendor/.
+ * @param bool   $is_css True to enqueue as a stylesheet rather than a script.
+ * @return void
+ */
+function cb_chillibyte_2026_enqueue_vendor( $handle, $file, $is_css = false ) {
+	$rel = '/js/vendor/' . $file;
+	$abs = get_stylesheet_directory() . $rel;
+	if ( ! file_exists( $abs ) ) {
+		return;
+	}
+	$url = get_stylesheet_directory_uri() . $rel;
+	if ( $is_css ) {
+		wp_enqueue_style( $handle, $url, array(), filemtime( $abs ) );
+	} else {
+		wp_enqueue_script( $handle, $url, array(), filemtime( $abs ), true );
+	}
+}
+
+/**
  * Enqueue theme.min.js.
  *
  * @return void
  */
 function cb_chillibyte_2026_enqueue_scripts() {
 
-	// wp_enqueue_script( 'gsap-scrolltrigger', 'https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js', array( 'gsap' ), '3.12.7', true );
-
-	wp_enqueue_style( 'lenis-style', 'https://unpkg.com/lenis@1.3.11/dist/lenis.css', array() );
-	wp_enqueue_script( 'lenis', 'https://unpkg.com/lenis@1.3.11/dist/lenis.min.js', array(), '1.3.11', true );
+	cb_chillibyte_2026_enqueue_vendor( 'lenis-style', 'lenis.css', true );
+	cb_chillibyte_2026_enqueue_vendor( 'lenis', 'lenis.min.js' );
 
 	// Global, not per-block — used across enough blocks (typewriter/reveal
 	// animations) that it belongs in the main bundle's dependency chain
 	// rather than each block re-registering it individually.
-	wp_enqueue_script( 'gsap', 'https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js', array(), '3.12.7', true );
+	cb_chillibyte_2026_enqueue_vendor( 'gsap', 'gsap.min.js' );
 
 	/*
 	 * Global for the same reason as gsap, and for one more: window.cbScribble
@@ -51,7 +83,7 @@ function cb_chillibyte_2026_enqueue_scripts() {
 	 * is missing). Making it a dependency here means presence is guaranteed
 	 * wherever the helper can be called from.
 	 */
-	wp_enqueue_script( 'rough-notation', 'https://cdn.jsdelivr.net/npm/rough-notation@0.5.1/lib/rough-notation.iife.js', array(), '0.5.1', true );
+	cb_chillibyte_2026_enqueue_vendor( 'rough-notation', 'rough-notation.iife.js' );
 
 	$rel = '/js/theme.min.js';
 	$abs = get_stylesheet_directory() . $rel;

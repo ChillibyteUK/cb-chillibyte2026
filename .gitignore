@@ -1,2 +1,7 @@
 node_modules
-vendor
+
+# Anchored to the theme root on purpose. Unanchored, "vendor" matches a
+# directory of that name at ANY depth — which silently excluded js/vendor/,
+# where the self-hosted copies of gsap/lenis/rough-notation live and which
+# must be committed (same convention as the compiled css/ and js/ output).
+/vendor
