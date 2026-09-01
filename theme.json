@@ -119,27 +119,27 @@
         {
           "name": "h2",
           "slug": "h2",
-          "size": "clamp(1.6rem, 0.9rem + 2.78vw, 3.2rem)"
+          "size": "clamp(2.4rem, 2.05rem + 1.39vw, 3.2rem)"
         },
         {
           "name": "h3",
           "slug": "h3",
-          "size": "clamp(1.3rem, 0.78rem + 2.09vw, 2.5rem)"
+          "size": "clamp(2.4rem, 2.36rem + 0.17vw, 2.5rem)"
         },
         {
           "name": "h4",
           "slug": "h4",
-          "size": "clamp(1.1rem, 0.71rem + 1.57vw, 2rem)"
+          "size": "clamp(2rem, 2rem + 0vw, 2rem)"
         },
         {
           "name": "h5",
           "slug": "h5",
-          "size": "clamp(1rem, 0.74rem + 1.04vw, 1.6rem)"
+          "size": "clamp(1.6rem, 1.6rem + 0vw, 1.6rem)"
         },
         {
           "name": "h6",
           "slug": "h6",
-          "size": "clamp(1rem, 0.87rem + 0.52vw, 1.3rem)"
+          "size": "clamp(1.3rem, 1.3rem + 0vw, 1.3rem)"
         }
       ]
     }
