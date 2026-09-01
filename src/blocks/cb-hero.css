@@ -76,6 +76,11 @@
     line-height: var(--line-height-heading);
     font-weight: var(--fw-200);
     color: var(--col-white);
+    @media (max-width: 767.98px) {
+      br {
+        display: none;
+      }
+    }
   }
 
   /*
