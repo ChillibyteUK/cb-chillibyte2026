@@ -1,7 +1,29 @@
+/*
+ * Contains the quote wrapper's [data-reveal-from="right"] start state — a
+ * translateX(2.5rem) on a full-width element sticks 40px past the right edge
+ * until it animates in. `clip` rather than `hidden` on purpose: `hidden`
+ * makes this a scroll container (and forces overflow-y to auto), which would
+ * break any position:sticky descendant; `clip` just clips.
+ *
+ * This is only a guard for the transform. It is NOT what keeps the block's
+ * own layout in bounds — `.row.row { column-gap }` in src/css/layout.css does
+ * that, theme-wide.
+ */
+.cb-text-quote {
+  overflow-x: clip;
+}
+
+.cb-text-quote .row,
+.cb-text-quote [class*="col-"] {
+  min-width: 0;
+}
+
 .cb-text-quote__quote-wrapper {
   display: flex;
   align-items: stretch;
   gap: var(--space-3);
+  min-width: 0;
+  width: 100%;
   /*
    * Decorative accent bar — a two-column layout (content box + plain
    * colour bar), not an offset/overlapping shadow, so a flex sibling is
@@ -26,6 +48,7 @@
 
 .cb-text-quote__quote {
   flex: 1;
+  min-width: 0;
   padding: var(--space-6) var(--space-5) var(--space-5) var(--space-5);
   background-color: var(--col-brand-green);
 }
@@ -64,10 +87,51 @@
 .cb-text-quote__quote-body {
   font-weight: var(--fw-800);
   line-height: var(--line-height-loose);
+  min-width: 0;
+
+  p {
+    overflow-wrap: anywhere;
+  }
+}
+
+.cb-text-quote .btn {
+  max-width: 100%;
+  white-space: normal;
+  text-wrap: pretty;
+}
+
+.cb-text-quote .btn-arrow {
+  align-items: flex-start;
+}
+
+.cb-text-quote .btn-arrow::after {
+  margin-top: 0.15em;
 }
 
 .cb-text-quote__quote--plain .cb-text-quote__quote-body {
   color: var(--col-blue);
   font-size: var(--fs-h4);
   line-height: 1.35;
+}
+
+@media (max-width: 767.98px) {
+  .cb-text-quote__quote-wrapper {
+    gap: 0.75rem;
+
+    &::after {
+      flex-basis: 0.8rem;
+    }
+  }
+
+  .cb-text-quote__quote {
+    padding: var(--space-4) var(--space-3) var(--space-3);
+  }
+
+  .cb-text-quote__quote-icon {
+    width: 2.5rem;
+  }
+
+  .cb-text-quote__quote--plain .cb-text-quote__quote-icon {
+    width: clamp(3.25rem, 18vw, 4.75rem);
+  }
 }
