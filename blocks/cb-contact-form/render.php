@@ -47,7 +47,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'cb-contac
 				<?php
 				if ( $form_shortcode ) {
 					?>
-				<p><?= esc_html( $form_shortcode ); ?></p>
+				<?= do_shortcode( $form_shortcode ); ?>
 					<?php
 				}
 				?>
