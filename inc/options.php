@@ -61,6 +61,7 @@ function cb_chillibyte_2026_register_settings_page() {
 	add_settings_section( 'cb_chillibyte_2026_general', 'General', '__return_false', 'theme-general-settings' );
 	add_settings_section( 'cb_chillibyte_2026_social', 'Social', '__return_false', 'theme-general-settings' );
 	add_settings_section( 'cb_chillibyte_2026_tracking', 'Tracking & Verification', '__return_false', 'theme-general-settings' );
+	add_settings_section( 'cb_chillibyte_2026_scripts', 'Scripts', '__return_false', 'theme-general-settings' );
 	add_settings_section( 'cb_chillibyte_2026_gallery', 'Gallery', '__return_false', 'theme-general-settings' );
 	add_settings_section( 'cb_chillibyte_2026_repeater', 'Repeater', '__return_false', 'theme-general-settings' );
 
@@ -129,6 +130,31 @@ function cb_chillibyte_2026_register_settings_page() {
 			'type'        => 'text',
 			'section'     => 'cb_chillibyte_2026_tracking',
 			'description' => 'Content value of the msvalidate.01 meta tag.',
+		),
+		'custom_head'              => array(
+			'label'       => 'Head',
+			'type'        => 'code',
+			'section'     => 'cb_chillibyte_2026_scripts',
+			'description' => 'Printed in <head> after the managed GA/GTM tags. Paste vendor snippets verbatim, <script> tags and all — nothing is escaped or filtered.',
+		),
+		'custom_body_open'         => array(
+			'label'       => 'Body Open',
+			'type'        => 'code',
+			'section'     => 'cb_chillibyte_2026_scripts',
+			'description' => 'Printed immediately after <body> opens, after the GTM noscript fallback. Where <noscript> tracking pixels belong.',
+		),
+		'custom_body_close'        => array(
+			'label'       => 'Body Close',
+			'type'        => 'code',
+			'section'     => 'cb_chillibyte_2026_scripts',
+			'description' => 'Printed just before </body>. Use for anything that must not block rendering — chat widgets, late-loading embeds.',
+		),
+		'custom_scripts_logged_out_only' => array(
+			'label'       => 'Logged-Out Visitors Only',
+			'type'        => 'checkbox',
+			'section'     => 'cb_chillibyte_2026_scripts',
+			'default'     => '1',
+			'description' => 'On by default, matching GA/GTM — keeps the team\'s own traffic out of whatever these scripts measure. Untick if a slot holds something every visitor should see, e.g. a chat widget.',
 		),
 		'awards_gallery'           => array(
 			'label'       => 'Awards Gallery',
@@ -258,8 +284,13 @@ function cb_chillibyte_2026_render_settings_field( $args ) {
 		return;
 	}
 
-	if ( 'textarea' === $args['type'] ) {
+	if ( 'textarea' === $args['type'] || 'code' === $args['type'] ) {
 		cb_chillibyte_2026_render_textarea_field( $args );
+		return;
+	}
+
+	if ( 'checkbox' === $args['type'] ) {
+		cb_chillibyte_2026_render_checkbox_field( $args );
 		return;
 	}
 
@@ -282,24 +313,76 @@ function cb_chillibyte_2026_render_settings_field( $args ) {
 }
 
 /**
- * Render a `textarea`-type field — for multi-line values like a postal
- * address. `<input type="textarea">` is not a real input type (browsers
- * silently degrade it to a single-line `type="text"`), so this needs its
- * own branch rather than falling through to the generic input above.
+ * Render a `textarea`- or `code`-type field — for multi-line values like a
+ * postal address or a pasted vendor script. `<input type="textarea">` is not
+ * a real input type (browsers silently degrade it to a single-line
+ * `type="text"`), so this needs its own branch rather than falling through to
+ * the generic input above.
  *
- * @param array $args Field args: key, placeholder, description.
+ * `code` differs only in presentation — monospace, no spellcheck/autocorrect,
+ * and taller by default. The stored value is a plain string either way;
+ * nothing here decides whether it's escaped on output, that's the caller's
+ * job (see inc/head-tags.php, which prints the script slots verbatim).
+ *
+ * @param array $args Field args: key, type, placeholder, rows, description.
  * @return void
  */
 function cb_chillibyte_2026_render_textarea_field( $args ) {
-	$value = cb_chillibyte_2026_get_setting( $args['key'] );
+	$value   = cb_chillibyte_2026_get_setting( $args['key'] );
+	$is_code = 'code' === $args['type'];
 	?>
 	<textarea
 		id="<?php echo esc_attr( $args['key'] ); ?>"
 		name="<?php echo esc_attr( CB_CHILLIBYTE_2026_SETTINGS_OPTION ); ?>[<?php echo esc_attr( $args['key'] ); ?>]"
 		placeholder="<?php echo esc_attr( $args['placeholder'] ?? '' ); ?>"
-		rows="<?php echo (int) ( $args['rows'] ?? 4 ); ?>"
+		rows="<?php echo (int) ( $args['rows'] ?? ( $is_code ? 10 : 4 ) ); ?>"
 		class="large-text"
+		<?php if ( $is_code ) : ?>
+		spellcheck="false"
+		autocapitalize="off"
+		autocomplete="off"
+		style="font-family: Consolas, Monaco, monospace; font-size: 12px; white-space: pre; overflow-wrap: normal; overflow-x: auto;"
+		<?php endif; ?>
 	><?php echo esc_textarea( $value ); ?></textarea>
+	<?php
+	if ( ! empty( $args['description'] ) ) {
+		?>
+		<p class="description"><?php echo esc_html( $args['description'] ); ?></p>
+		<?php
+	}
+}
+
+/**
+ * Render a `checkbox`-type field.
+ *
+ * An unticked checkbox posts nothing at all, which is indistinguishable from
+ * "never saved" — so a paired hidden input submits '0' first and the checkbox
+ * overwrites it with '1' when ticked. That's what makes a default-on checkbox
+ * possible: absent means genuinely-never-saved (fall back to `default`),
+ * '0' means deliberately unticked.
+ *
+ * Note this only works because cb_chillibyte_2026_get_setting() treats '' as
+ * unset but returns '0' as-is — and '0' is falsey in PHP, so callers can just
+ * test the returned value.
+ *
+ * @param array $args Field args: key, label, default, description.
+ * @return void
+ */
+function cb_chillibyte_2026_render_checkbox_field( $args ) {
+	$value = cb_chillibyte_2026_get_setting( $args['key'], $args['default'] ?? '0' );
+	$name  = sprintf( '%s[%s]', CB_CHILLIBYTE_2026_SETTINGS_OPTION, $args['key'] );
+	?>
+	<input type="hidden" name="<?php echo esc_attr( $name ); ?>" value="0">
+	<label>
+		<input
+			type="checkbox"
+			id="<?php echo esc_attr( $args['key'] ); ?>"
+			name="<?php echo esc_attr( $name ); ?>"
+			value="1"
+			<?php checked( '1', $value ); ?>
+		>
+		<?php echo esc_html( $args['checkbox_label'] ?? 'Enabled' ); ?>
+	</label>
 	<?php
 	if ( ! empty( $args['description'] ) ) {
 		?>
