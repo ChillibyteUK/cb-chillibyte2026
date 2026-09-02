@@ -11,12 +11,12 @@
 					<div class="mt-3 mb-4 has-grey-700-text has-small-font-size">
 						Part of the <a href="https://www.broadlightgroup.co.uk/" target="_blank" rel="noopener noreferrer">Broadlight Group</a>.
 					</div>
-					<div class="footer-partners">
+					<!-- <div class="footer-partners">
 						<a href="https://www.google.com/partners/agency?id=7053046863" target="_blank">
 							<img src="https://www.gstatic.com/partners/badge/images/2025/PartnerBadgeClickable.svg">
 						</a>
 						<img src="<?= esc_url( get_template_directory_uri() . '/img/bing.png' ); ?>" alt="Bing Partner Logo" width="131" height="69">
-					</div>
+					</div> -->
 				</div>
 				<div class="col-12 col-md-6 col-lg-2">
 					<div class="navbar-title">Our office</div>
