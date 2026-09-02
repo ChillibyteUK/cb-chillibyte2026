@@ -8,6 +8,7 @@
 @import "footer.css";
 @import "single.css";
 @import "forms.css";
+@import "gravity-forms.css"; /* legacy gravity-theme overrides — keep after forms.css */
 @import "utilities.css"; /* generated — see src/build/generate-utilities.js, run `npm run css-generate` */
 /* @import "tables.css"; -- uncomment if this project actually needs styled tables */
 @import "accordion.css"; /* used by blocks/cb-faqs */

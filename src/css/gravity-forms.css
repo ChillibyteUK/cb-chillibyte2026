@@ -1,0 +1,70 @@
+/*
+ * Gravity Forms — overrides for the legacy "gravity-theme" (2.5) output.
+ *
+ * This project deliberately runs GF's legacy theme rather than orbital: the
+ * 2.9 "framework" CSS styles fields at a specificity that outranks parts of
+ * forms.css, so the two fought. Legacy sets far less, which leaves the
+ * theme's own field styling in charge. Field borders/padding therefore live
+ * in forms.css, not here — this file only handles what GF owns: label
+ * treatment and the grid rhythm between fields.
+ *
+ * Specificity note: GF's rules here are (0,3,0) — e.g.
+ * `.gform_wrapper.gravity-theme .gfield_label`. Matching that exactly would
+ * be a tie broken by stylesheet order, which isn't guaranteed against a
+ * plugin's enqueue. So every rule below deliberately adds one more class the
+ * element already carries (`.gfield`, `.top_label`) to land at (0,4,0) and
+ * win outright, rather than relying on load order.
+ */
+
+.gform_wrapper.gravity-theme {
+  /* GF's own grid gap is tighter than the site's rhythm. */
+  & .gform_fields.top_label {
+    row-gap: var(--space-4);
+  }
+
+  /*
+   * All labels bold, not just top-level ones. GF gives `.gfield_label` a
+   * 700 weight but leaves sub-labels (`--type-sub`, the First/Last name
+   * pair) at the inherited weight, which is what made them read as a
+   * different tier of information when they're really the same thing.
+   * Targeting `.gform-field-label` catches both, since top-level labels
+   * carry it alongside `.gfield_label`.
+   */
+  & .gfield .gform-field-label {
+    font-weight: var(--fw-bold);
+    margin-bottom: var(--space-2);
+    color: var(--col-body);
+  }
+
+  /* The `(Required)` marker shouldn't compete with the label it annotates. */
+  & .gfield .gfield_required {
+    font-weight: var(--fw-normal);
+    font-size: var(--fs-small);
+    color: var(--col-grey-600);
+  }
+
+  /* Descriptions and the character counter are secondary to the field. */
+  & .gfield .gfield_description,
+  & .gfield .charleft {
+    font-size: var(--fs-small);
+    color: var(--col-grey-600);
+  }
+
+  & .gfield .gfield_description {
+    padding-block: 0;
+    margin-bottom: var(--space-2);
+  }
+
+  /* Sub-label pairs (First/Last) sit tighter to their own inputs than
+     separate fields do to each other. */
+  & .gfield .ginput_complex {
+    column-gap: var(--space-3);
+    row-gap: var(--space-2);
+  }
+
+  /* GF ships an 8px bottom margin on the footer button; the section's own
+     padding handles that spacing here. */
+  & .gform_footer .gform_button {
+    margin-bottom: 0;
+  }
+}
