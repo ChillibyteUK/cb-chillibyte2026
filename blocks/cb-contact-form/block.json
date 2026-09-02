@@ -13,10 +13,6 @@
 		"showAddress": {
 			"type": "boolean",
 			"default": false
-		},
-		"formShortcode": {
-			"type": "string",
-			"default": ""
 		}
 	},
 	"supports": {

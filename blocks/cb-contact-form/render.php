@@ -7,9 +7,9 @@
 
 defined( 'ABSPATH' ) || exit;
 
-$btitle             = $attributes['title'] ?? '';
-$show_address       = ! empty( $attributes['showAddress'] );
-$form_shortcode     = $attributes['formShortcode'] ?? '';
+$btitle       = $attributes['title'] ?? '';
+$show_address = ! empty( $attributes['showAddress'] );
+$form_shortcode     = cb_chillibyte_2026_get_setting( 'contact_form' );
 $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'cb-contact-form' ) );
 ?>
 <section <?= $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() already escapes. ?>>

@@ -82,9 +82,11 @@ function cb_chillibyte_2026_register_settings_page() {
 			'section' => 'cb_chillibyte_2026_general',
 		),
 		'contact_form'             => array(
-			'label'   => 'Contact Form Shortcode',
-			'type'    => 'text',
-			'section' => 'cb_chillibyte_2026_general',
+			'label'       => 'Contact Form Shortcode',
+			'type'        => 'text',
+			'section'     => 'cb_chillibyte_2026_general',
+			'placeholder' => '[gravityform id="1" title="false"]',
+			'description' => 'Rendered by the CB Contact Form block, on every page that uses it. Leave blank to output no form at all.',
 		),
 		'map_url'                  => array(
 			'label'   => 'Map URL',
