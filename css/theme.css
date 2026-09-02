@@ -22,6 +22,10 @@
   --col-body-bg: var(--col-white);
 
   --col-brand-green: #8dc53e;
+  /* Same hue and saturation as brand green, darkened to 4.99:1 on white.
+     Brand green itself is 2.06:1, well under the 4.5:1 AA minimum, so it
+     can't carry text — use this for links and any green body copy. */
+  --col-brand-green-dark: #567a25;
   --col-brand-red: #ed1b24;
 
   --col-beige: #f4f2ed;
@@ -240,6 +244,13 @@ strong {
 a {
   color: var(--col-primary);
   text-decoration: none;
+}
+
+/* Plain content links inside the page body are brand green rather than the
+   default primary blue. Scoped to <main> so header/footer links, which sit on
+   their own backgrounds, keep the base colour. */
+main a:not([class]) {
+  color: var(--col-brand-green-dark);
 }
 
 /*
@@ -1214,17 +1225,8 @@ select {
   border-radius: var(--radius-sm);
   background-color: var(--col-white);
   color: var(--col-body);
-  transition:
-    border-color var(--transition),
-    box-shadow var(--transition);
 }
-:is(input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="image"]),textarea,select):hover {
-    border-color: var(--col-grey-600);
-  }
-/* Border colour alone is a weak focus cue at this border weight, so pair it
-     with the outline the base already had rather than replacing it. */
 :is(input:not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="image"]),textarea,select):focus-visible {
-    border-color: var(--col-primary);
     outline: 2px solid var(--col-primary);
     outline-offset: 1px;
   }
@@ -1331,19 +1333,15 @@ select {
 /*
  * Gravity Forms — overrides for the legacy "gravity-theme" (2.5) output.
  *
- * This project deliberately runs GF's legacy theme rather than orbital: the
- * 2.9 "framework" CSS styles fields at a specificity that outranks parts of
- * forms.css, so the two fought. Legacy sets far less, which leaves the
- * theme's own field styling in charge. Field borders/padding therefore live
- * in forms.css, not here — this file only handles what GF owns: label
- * treatment and the grid rhythm between fields.
+ * Field borders/padding are not here: GF's legacy CSS sets no `textarea` or
+ * text-input rules at all, so forms.css governs those directly. This file
+ * only covers what GF does own — label weight and the grid rhythm.
  *
- * Specificity note: GF's rules here are (0,3,0) — e.g.
+ * Specificity note: GF's rules are (0,3,0), e.g.
  * `.gform_wrapper.gravity-theme .gfield_label`. Matching that exactly would
  * be a tie broken by stylesheet order, which isn't guaranteed against a
- * plugin's enqueue. So every rule below deliberately adds one more class the
- * element already carries (`.gfield`, `.top_label`) to land at (0,4,0) and
- * win outright, rather than relying on load order.
+ * plugin's enqueue — so each rule adds one more class the element already
+ * carries (`.gfield`, `.top_label`) to reach (0,4,0) and win outright.
  */
 
 /* GF's own grid gap is tighter than the site's rhythm. */
@@ -1353,53 +1351,24 @@ select {
   }
 
 /*
-   * All labels bold, not just top-level ones. GF gives `.gfield_label` a
-   * 700 weight but leaves sub-labels (`--type-sub`, the First/Last name
-   * pair) at the inherited weight, which is what made them read as a
-   * different tier of information when they're really the same thing.
-   * Targeting `.gform-field-label` catches both, since top-level labels
-   * carry it alongside `.gfield_label`.
+   * All labels bold, not just top-level ones. GF gives `.gfield_label` a 700
+   * weight but leaves sub-labels (`--type-sub`, the First/Last name pair) at
+   * the inherited weight, which made them read as a lesser tier of
+   * information when they're the same thing. `.gform-field-label` catches
+   * both, since top-level labels carry it alongside `.gfield_label`.
    */
 
 .gform_wrapper.gravity-theme .gfield .gform-field-label {
     font-weight: var(--fw-bold);
     margin-bottom: var(--space-2);
-    color: var(--col-body);
   }
 
-/* The `(Required)` marker shouldn't compete with the label it annotates. */
-
-.gform_wrapper.gravity-theme .gfield .gfield_required {
-    font-weight: var(--fw-normal);
-    font-size: var(--fs-small);
-    color: var(--col-grey-600);
-  }
-
-/* Descriptions and the character counter are secondary to the field. */
-
-.gform_wrapper.gravity-theme .gfield .gfield_description,.gform_wrapper.gravity-theme .gfield .charleft {
-    font-size: var(--fs-small);
-    color: var(--col-grey-600);
-  }
-
-.gform_wrapper.gravity-theme .gfield .gfield_description {
-    padding-block: 0;
-    margin-bottom: var(--space-2);
-  }
-
-/* Sub-label pairs (First/Last) sit tighter to their own inputs than
-     separate fields do to each other. */
+/* Sub-label pairs sit tighter to their own inputs than separate fields do
+     to each other. */
 
 .gform_wrapper.gravity-theme .gfield .ginput_complex {
     column-gap: var(--space-3);
     row-gap: var(--space-2);
-  }
-
-/* GF ships an 8px bottom margin on the footer button; the section's own
-     padding handles that spacing here. */
-
-.gform_wrapper.gravity-theme .gform_footer .gform_button {
-    margin-bottom: 0;
   }
 
 /* legacy gravity-theme overrides — keep after forms.css */

@@ -22,6 +22,10 @@
   --col-body-bg: var(--col-white);
 
   --col-brand-green: #8dc53e;
+  /* Same hue and saturation as brand green, darkened to 4.99:1 on white.
+     Brand green itself is 2.06:1, well under the 4.5:1 AA minimum, so it
+     can't carry text — use this for links and any green body copy. */
+  --col-brand-green-dark: #567a25;
   --col-brand-red: #ed1b24;
 
   --col-beige: #f4f2ed;

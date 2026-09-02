@@ -54,6 +54,12 @@
           "origin": "theme"
         },
         {
+          "name": "brand-green-dark",
+          "slug": "brand-green-dark",
+          "color": "#567a25",
+          "origin": "theme"
+        },
+        {
           "name": "brand-red",
           "slug": "brand-red",
           "color": "#ed1b24",

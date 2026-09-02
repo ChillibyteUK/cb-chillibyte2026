@@ -35,18 +35,8 @@ select {
   border-radius: var(--radius-sm);
   background-color: var(--col-white);
   color: var(--col-body);
-  transition:
-    border-color var(--transition),
-    box-shadow var(--transition);
 
-  &:hover {
-    border-color: var(--col-grey-600);
-  }
-
-  /* Border colour alone is a weak focus cue at this border weight, so pair it
-     with the outline the base already had rather than replacing it. */
   &:focus-visible {
-    border-color: var(--col-primary);
     outline: 2px solid var(--col-primary);
     outline-offset: 1px;
   }

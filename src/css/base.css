@@ -67,6 +67,13 @@ a {
   text-decoration: none;
 }
 
+/* Plain content links inside the page body are brand green rather than the
+   default primary blue. Scoped to <main> so header/footer links, which sit on
+   their own backgrounds, keep the base colour. */
+main a:not([class]) {
+  color: var(--col-brand-green-dark);
+}
+
 /*
  * Underline-on-hover only for plain content links (no class) — cards,
  * buttons, nav items, and social/icon links all carry their own class and
