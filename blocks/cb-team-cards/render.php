@@ -57,13 +57,13 @@ if ( empty( $btitle ) && empty( $intro ) && ! $people->have_posts() ) {
 
 				$person_id      = get_the_ID();
 				$role           = get_post_meta( $person_id, 'role', true );
-				$thumbnail_url  = get_the_post_thumbnail_url( $person_id, 'large' );
+				$thumbnail_id   = get_post_thumbnail_id( $person_id );
 				?>
 				<div class="col-12 col-md-6 col-lg-4 col-xl-3 cb-team-cards__item">
 					<article class="cb-team-cards__card" data-reveal data-reveal-from="zoom">
 						<div class="cb-team-cards__media">
-							<?php if ( $thumbnail_url ) { ?>
-								<img class="cb-team-cards__image" src="<?php echo esc_url( $thumbnail_url ); ?>" alt="<?php echo esc_attr( get_the_title() ); ?>">
+							<?php if ( $thumbnail_id ) { ?>
+								<?php echo wp_get_attachment_image( $thumbnail_id, 'large', false, array( 'class' => 'cb-team-cards__image', 'alt' => get_the_title() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_get_attachment_image() already escapes its output. ?>
 							<?php } else { ?>
 								<div class="cb-team-cards__image cb-team-cards__image--placeholder" aria-hidden="true"></div>
 							<?php } ?>

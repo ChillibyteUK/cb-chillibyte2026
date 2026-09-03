@@ -38,10 +38,21 @@ function cbHeroWrapChars( node ) {
  * this function controls the timing instead. window.cbRevealSequence /
  * window.cbScribble are the same shared helpers reveal.js uses for its own
  * auto-sequenced reveals elsewhere on the site — see src/js/reveal.js.
+ *
+ * This block's viewScript only declares gsap as a dependency (see
+ * block.json), not the full theme bundle that defines these two globals,
+ * so the typewriter can start as soon as gsap is ready instead of queuing
+ * behind lenis/rough-notation/theme.min.js. Guarded rather than assumed
+ * present for that reason — in the extremely unlikely case the bundle
+ * hasn't finished executing yet, skip rather than throw.
  */
 function cbHeroRevealContent( hero ) {
 	var container = hero.querySelector( '[data-reveal-container]' );
-	if ( container ) window.cbRevealSequence( container );
+	if ( container && typeof window.cbRevealSequence === 'function' ) window.cbRevealSequence( container );
+}
+
+function cbHeroScribble( h1 ) {
+	if ( typeof window.cbScribble === 'function' ) window.cbScribble( h1 );
 }
 
 function initCbHero() {
@@ -52,7 +63,7 @@ function initCbHero() {
 		// No gsap? Skip the typewriter and just show everything as-is.
 		if ( typeof gsap === 'undefined' ) {
 			h1.style.opacity = '1';
-			window.cbScribble( h1 );
+			cbHeroScribble( h1 );
 			cbHeroRevealContent( hero );
 			return;
 		}
@@ -80,7 +91,7 @@ function initCbHero() {
 				// (mistaken for one per line) instead of one per actual
 				// visual line, producing a jagged per-character underline.
 				h1.innerHTML = originalHTML;
-				window.cbScribble( h1 );
+				cbHeroScribble( h1 );
 				cbHeroRevealContent( hero );
 			} );
 	} );

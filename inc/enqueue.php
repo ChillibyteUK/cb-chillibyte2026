@@ -117,3 +117,56 @@ function cb_chillibyte_2026_enqueue_script_modules() {
 	wp_enqueue_script_module( 'prop-for-that', 'https://esm.sh/prop-for-that@0.7.12/auto', array(), '0.7.12' );
 }
 add_action( 'wp_enqueue_scripts', 'cb_chillibyte_2026_enqueue_script_modules' );
+
+/**
+ * Dequeue Gravity Forms (and its Turnstile add-on) CSS/JS on any page that
+ * doesn't actually render the contact form block.
+ *
+ * Gravity Forms' own conditional-loading logic looks for the
+ * [gravityform] shortcode (or its own block) sitting directly in
+ * post_content. That never matches here: cb-contact-form pulls its
+ * shortcode from a Site-Wide Settings option and runs it through
+ * do_shortcode() at render time (see blocks/cb-contact-form/render.php),
+ * so GF has no way to tell which pages need its assets and — per a live
+ * trace of the homepage — enqueues them everywhere regardless, several
+ * render-blocking stylesheets included.
+ *
+ * This checks for our own wrapper block instead (has_block() reads
+ * post_content directly, so it works whether or not the block itself
+ * bothers to call GF's detection) and strips anything already enqueued
+ * whose src lives under the plugin's own directory when that block is
+ * absent. Matched by plugin path rather than specific handle names so a
+ * Gravity Forms/Turnstile update that renames a handle doesn't silently
+ * stop this working. Priority 100 so it runs after GF's own
+ * wp_enqueue_scripts registration (default priority 10).
+ *
+ * @return void
+ */
+function cb_chillibyte_2026_dequeue_unused_gravityforms_assets() {
+	if ( is_admin() || has_block( 'cb-chillibyte-2026/cb-contact-form' ) ) {
+		return;
+	}
+
+	$plugin_slugs = array( 'gravityforms', 'gravityformsturnstile' );
+
+	foreach ( wp_styles()->queue as $handle ) {
+		$style = wp_styles()->registered[ $handle ] ?? null;
+		foreach ( $plugin_slugs as $plugin_slug ) {
+			if ( $style && is_string( $style->src ) && false !== strpos( $style->src, "/plugins/{$plugin_slug}/" ) ) {
+				wp_dequeue_style( $handle );
+				break;
+			}
+		}
+	}
+
+	foreach ( wp_scripts()->queue as $handle ) {
+		$script = wp_scripts()->registered[ $handle ] ?? null;
+		foreach ( $plugin_slugs as $plugin_slug ) {
+			if ( $script && is_string( $script->src ) && false !== strpos( $script->src, "/plugins/{$plugin_slug}/" ) ) {
+				wp_dequeue_script( $handle );
+				break;
+			}
+		}
+	}
+}
+add_action( 'wp_enqueue_scripts', 'cb_chillibyte_2026_dequeue_unused_gravityforms_assets', 100 );

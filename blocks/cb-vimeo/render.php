@@ -59,7 +59,7 @@ if ( 'Container' === $size ) {
 		<?php
 		if ( $vimeo_id ) {
 			?>
-		<iframe src="https://player.vimeo.com/video/<?= esc_attr( $vimeo_id ); ?>" frameborder="0" allowfullscreen=""></iframe>
+		<iframe src="https://player.vimeo.com/video/<?= esc_attr( $vimeo_id ); ?>" frameborder="0" allowfullscreen="" loading="lazy"></iframe>
 			<?php
 		}
 		?>

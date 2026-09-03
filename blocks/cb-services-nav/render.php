@@ -57,7 +57,7 @@ if ( $service_page ) {
 						echo wp_get_attachment_image( $image_id, 'large', false, array( 'class' => 'cb-services-nav__image', 'alt' => $image_alt ) );
 					} else {
 						?>
-						<img class="cb-services-nav__image" src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>">
+						<img class="cb-services-nav__image" src="<?php echo esc_url( $image_url ); ?>" alt="<?php echo esc_attr( $image_alt ); ?>" loading="lazy">
 						<?php
 					}
 					?>

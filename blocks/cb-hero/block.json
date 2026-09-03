@@ -41,7 +41,7 @@
 		"align": true
 	},
 	"editorScript": "file:./build/index.js",
-	"viewScript": [ "cb-chillibyte-2026-theme", "file:./view.js", "file:../../animation/js/reveal.js" ],
+	"viewScript": [ "gsap", "file:./view.js", "file:../../animation/js/reveal.js" ],
 	"style": "file:../../animation/css/reveal.css",
 	"render": "file:./render.php"
 }

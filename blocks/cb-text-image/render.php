@@ -49,12 +49,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'cb-text-i
 			<div class="col-12 col-md-5 my-auto mx-auto">
 				<?php
 				if ( $image_id ) {
-					$image_url = wp_get_attachment_image_url( $image_id, 'full' );
-					if ( $image_url ) {
-						?>
-				<img src="<?= esc_url( $image_url ); ?>" alt="" class="img-fluid" data-reveal>
-						<?php
-					}
+					echo wp_get_attachment_image( $image_id, 'large', false, array( 'class' => 'img-fluid', 'data-reveal' => '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_get_attachment_image() already escapes its output.
 				}
 				?>
 			</div>

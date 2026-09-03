@@ -36,7 +36,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'cb-blog-c
 				$q->the_post();
 
 				$current_post_id = get_the_ID();
-				$thumbnail_url   = get_the_post_thumbnail_url( $current_post_id, 'large' );
+				$thumbnail_id    = get_post_thumbnail_id( $current_post_id );
 				$excerpt         = wp_trim_words( get_the_excerpt(), 22, '...' );
 				$categories      = get_the_category();
 				$category_name   = ! empty( $categories ) ? $categories[0]->name : '';
@@ -58,7 +58,7 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'cb-blog-c
 				$cards[] = array(
 					'permalink'      => get_permalink(),
 					'title'          => get_the_title(),
-					'image_url'      => $thumbnail_url,
+					'thumbnail_id'   => $thumbnail_id,
 					'excerpt'        => $excerpt,
 					'date'           => get_the_date( 'M j, Y' ),
 					'reading_time'   => $reading_time,
@@ -86,8 +86,8 @@ $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'cb-blog-c
 			<div class="col-12 col-md-6 col-lg-4 mb-4 cb-blog-cards__item" data-blog-card data-categories="<?= esc_attr( $card['category_slugs'] ); ?>">
 				<a class="cb-blog-cards__card" href="<?= esc_url( $card['permalink'] ); ?>">
 					<div class="cb-blog-cards__media">
-						<?php if ( $card['image_url'] ) { ?>
-							<img class="cb-blog-cards__card-image" src="<?= esc_url( $card['image_url'] ); ?>" alt="<?= esc_attr( $card['title'] ); ?>">
+						<?php if ( $card['thumbnail_id'] ) { ?>
+							<?= wp_get_attachment_image( $card['thumbnail_id'], 'large', false, array( 'class' => 'cb-blog-cards__card-image', 'alt' => $card['title'] ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_get_attachment_image() already escapes its output. ?>
 						<?php } else { ?>
 							<div class="cb-blog-cards__card-image cb-blog-cards__card-image--placeholder" aria-hidden="true"></div>
 						<?php } ?>
