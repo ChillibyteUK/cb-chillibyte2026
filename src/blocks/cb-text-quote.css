@@ -110,7 +110,7 @@
 
 .cb-text-quote__quote--plain .cb-text-quote__quote-body {
   color: var(--col-blue);
-  font-size: var(--fs-h4);
+  font-size: var(--fs-h5);
   line-height: 1.35;
 }
 
