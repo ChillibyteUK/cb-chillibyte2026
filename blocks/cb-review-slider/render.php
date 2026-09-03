@@ -8,7 +8,7 @@
 defined( 'ABSPATH' ) || exit;
 
 $btitle             = $attributes['title'] ?? '';
-$brb_slider         = $attributes['brbShortcode'] ?? 'BRB SHORTCODE';
+$brb_slider         = $attributes['brbShortcode'] ?? '';
 $wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'cb-review-slider' ) );
 ?>
 <section <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_block_wrapper_attributes() already escapes. ?>>
