@@ -1,0 +1,84 @@
+/*
+ * CB Numbered Grid — six-ish numbered peers.
+ *
+ * The card is deliberately the same object as .cb-stat-grid__card (white,
+ * radius-lg, hairline border, left accent bar): both are "large numeral plus
+ * supporting text", and the two sections sit near each other on service
+ * pages. Keep them in step if either changes.
+ */
+
+.cb-numbered-grid {
+  padding-block: clamp(var(--space-5), 8vw, var(--space-6));
+}
+
+.cb-numbered-grid__grid {
+  /* Six items at the 16rem default lands 4-up on wide screens, which leaves a
+     stranded pair on the second row. 20rem gives a 3 x 2 / 2 x 3 / 1 grid. */
+  --grid-min: 20rem;
+
+  align-items: stretch;
+}
+
+.cb-numbered-grid__card {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: var(--space-3);
+  min-height: 100%;
+  padding: clamp(var(--space-3), 2vw, var(--space-4));
+  padding-left: clamp(var(--space-4), 3vw, var(--space-5));
+  border: 1px solid color-mix(in srgb, var(--col-blue) 12%, var(--col-grey-300));
+  border-radius: var(--radius-lg);
+  background: var(--col-white);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+
+  /* Flat green, not cb-stat-grid's green-to-red ramp — a ramp across a set of
+     equals starts to read as progression, which is exactly the wrong signal
+     for these. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0.35rem;
+    background: var(--col-brand-green);
+  }
+}
+
+.cb-numbered-grid__head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--col-blue) 10%, var(--col-grey-300));
+}
+
+/*
+ * Brand green proper is 2.06:1 on white — under the 3:1 large-text minimum
+ * even at this size — so the numeral uses the darkened token.
+ */
+.cb-numbered-grid__number {
+  flex: none;
+  color: var(--col-brand-green-dark);
+  font-size: clamp(1.9rem, 1.4rem + 1.6vw, 2.5rem);
+  font-weight: var(--fw-800);
+  letter-spacing: -0.06em;
+  line-height: 0.88;
+  font-variant-numeric: tabular-nums;
+}
+
+.cb-numbered-grid__title {
+  margin: 0;
+  color: var(--col-blue);
+  font-size: var(--fs-lg);
+  font-weight: var(--fw-800);
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.cb-numbered-grid__body {
+  margin: 0;
+  color: var(--col-grey-700);
+  font-size: var(--fs-base);
+}
