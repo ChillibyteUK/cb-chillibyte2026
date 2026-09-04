@@ -137,8 +137,15 @@ function playReveal(svg, cells, {
 
   cells.forEach(({ el, row, col, value }) => {
     if (skipTransparent && value === 0) {
-      el.style.opacity = alwaysVisible ? '1' : '0';
-      el.style.fill = 'var(--colour-blank)';
+      // fill:transparent, not --colour-blank. Painting blanks in the blank
+      // colour made every empty cell an svg rect sitting on top of the
+      // container's tiled filler, so the two had to agree pixel for pixel -
+      // and they can't: the rect has rx:2 corners and antialiased edges the
+      // css tile doesn't. That's what showed as a colour difference and a
+      // ragged seam down the leftmost column. Letting the tile show through
+      // means a blank cell is drawn exactly once, by css.
+      el.style.opacity = '1';
+      el.style.fill = 'transparent';
       return; // leave animation as 'none' - stays static, no flicker/delay
     }
     el.style.removeProperty('opacity');

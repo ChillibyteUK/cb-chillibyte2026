@@ -45,6 +45,26 @@
   }
 }
 
+/*
+ * .is-active scales the card 1.02 from transform-origin: left, so its right
+ * edge grows ~2% of the card width. The card already sits 1rem outside the
+ * container on each side (the negative margin-inline below cancelling
+ * .container's padding), so below the container's max-width it spans the full
+ * viewport and that extra 2% became horizontal page overflow.
+ *
+ * clip, not hidden, for two reasons: overflow-x: hidden computes overflow-y to
+ * auto, and either of those makes this a scroll container — which would break
+ * .cb-service-details__intro-col's position: sticky below. clip creates no
+ * scroll container, so the sticky column still resolves against the viewport.
+ *
+ * Nothing visible is lost: at or above the container's max-width there's slack
+ * either side and no overflow to clip, and below it the clipped sliver was
+ * off-screen anyway.
+ */
+.cb-service-details {
+  overflow-x: clip;
+}
+
 .cb-service-details__items {
   display: grid;
   gap: clamp(var(--space-3), 2vw, var(--space-4));
@@ -54,7 +74,22 @@
   display: grid;
   gap: 0.85rem;
   padding-block: clamp(var(--space-3), 2vw, var(--space-4));
-  padding-inline: var(--space-3);
+  /*
+   * Asymmetric on purpose. .is-active scales 1.02 from the left edge, so the
+   * text's right edge moves right by 2% of the card width — ~17px once the
+   * card is full-bleed — which put it past the viewport and into the clip.
+   *
+   * Extra padding-inline-end is the only lever that helps. Raising
+   * padding-inline as a whole does nothing: it's cancelled by the matching
+   * negative margin-inline below, so the text box never actually moves and
+   * the scale still eats the same 2%. Measured at an 853px viewport:
+   * 1rem end padding gives -0.7px clearance, 2rem gives 15.6px.
+   *
+   * On every item rather than just .is-active, so activating a card doesn't
+   * rewrap its body text. The start padding is untouched, so text stays
+   * aligned with the intro column and the rest of the page.
+   */
+  padding-inline: var(--space-3) calc(var(--space-3) * 2);
   margin-inline: calc(var(--space-3) * -1);
   border-left: 3px solid transparent;
   background: transparent;

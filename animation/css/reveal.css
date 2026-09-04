@@ -13,6 +13,13 @@
   /* every grid is standardised to 28x23 cells (see extract_grid.py) -
      rows is a fixed constant now, not something only JS can know */
   --grid-rows: 23;
+  --grid-cols: 28;
+  /* gap as a fraction of one cell, matching reveal.js's cellSize/gap
+     defaults (2/20). --gap above is the authored px value; the tiled
+     filler needs the *scaled* one, because the svg's 2-unit gap grows
+     with preserveAspectRatio while a px value would not. Keep in sync
+     if either default changes. */
+  --gap-ratio: 0.1;
 }
 
 /* hero box: clamps between 100vh and 700px tall, full width of its
@@ -25,25 +32,75 @@
   position: relative;
   width: 100%;
   min-width: 220px;
-  height: min(100vh, var(--hero-max-height));
+  height: var(--grid-h);
   overflow: hidden;
   background-color: var(--colour-blank);
-  /* cheap "empty cell" filler: two repeating gradients drawing the gap
-     lines, no image request, no extra DOM. cell size is derived with
-     the exact same formula as the container's own height, so it's
-     correct from the very first paint - no JS, no resize listener,
-     no load-in size jump. */
-  --bg-cell: calc(min(100vh, var(--hero-max-height)) / var(--grid-rows));
+
+  /*
+   * The three numbers everything below derives from. --grid-w is the width
+   * the shape wants at this height (cols x cell), so `max(100%, --grid-w)`
+   * is the whole responsive story in one expression:
+   *
+   *   container wider than the shape needs -> 100% wins, the svg box is the
+   *     container, preserveAspectRatio right-aligns the content inside it and
+   *     letterboxes the left.
+   *   container narrower -> --grid-w wins, the box overflows, overflow:hidden
+   *     crops it, and the shape fills the full width.
+   *
+   * This replaces the pair of hardcoded breakpoints that used to do the same
+   * job. They couldn't be right for both heroes at once: the crossover is
+   * `width < cols/rows x height`, which is ~974px for the 800px homepage hero
+   * but ~511px for the 420px short one, and neither is a breakpoint. Deriving
+   * it means it's exact for both, at any viewport height, and stays exact for
+   * any future --hero-max-height without another query.
+   */
+  --grid-h: min(100vh, var(--hero-max-height));
+  --bg-cell: calc(var(--grid-h) / var(--grid-rows));
+  --grid-w: calc(var(--bg-cell) * var(--grid-cols));
+  /*
+   * Scaled to match the svg, not the authored 2px: reveal.js insets each
+   * rect by gap/2 on every side, so the gap a cell actually sits in is
+   * split half to one tile and half to its neighbour. Drawing the line as
+   * a full --gap at only the leading edge put the tiled filler half a gap
+   * out of step with the real cells, and drawing it at a fixed 2px made
+   * the error grow with the scale factor. Half at each edge, sized from
+   * the cell, reproduces the svg's own geometry exactly.
+   */
+  --bg-gap: calc(var(--bg-cell) * var(--gap-ratio));
+}
+
+/*
+ * The tiled "empty cell" filler: two gradients drawing the gap lines, no
+ * image request. It lives on a pseudo-element rather than the container
+ * because it has to sit in the *svg's* box, not the container's — those are
+ * only the same thing while the svg fits. Once the container is narrow enough
+ * that the svg overflows and is centred, a container-anchored tile drifts out
+ * of step with the real cells by half the overflow, which is what made the
+ * filler visible as a mismatched grid through the now-transparent blank cells.
+ *
+ * Sharing --grid-w/--grid-h with svg.grid below is what guarantees they can't
+ * disagree: same width expression, same height, same centring, so the tile
+ * origin is the shape's own right edge in every case.
+ */
+.grid-container::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 50%;
+  width: max(100%, var(--grid-w));
+  height: 100%;
+  transform: translateX(-50%);
   background-image:
     linear-gradient(
       to right,
-      var(--bg) 0 var(--gap),
-      transparent var(--gap) 100%
+      var(--bg) 0 calc(var(--bg-gap) / 2),
+      transparent calc(var(--bg-gap) / 2) calc(100% - var(--bg-gap) / 2),
+      var(--bg) calc(100% - var(--bg-gap) / 2) 100%
     ),
     linear-gradient(
       to bottom,
-      var(--bg) 0 var(--gap),
-      transparent var(--gap) 100%
+      var(--bg) 0 calc(var(--bg-gap) / 2),
+      transparent calc(var(--bg-gap) / 2) calc(100% - var(--bg-gap) / 2),
+      var(--bg) calc(100% - var(--bg-gap) / 2) 100%
     );
   background-size: var(--bg-cell) var(--bg-cell);
   /* tile from the top-right corner - right because that's where the
@@ -56,13 +113,28 @@
 svg.grid {
   display: block;
   position: absolute;
-  inset: 0;
-  width: 100%;
+  /*
+   * Same box as .grid-container::before, deliberately — see the note there.
+   * Wide container: max() picks 100%, the box is the container, and
+   * preserveAspectRatio="xMaxYMid meet" (set in reveal.js) right-aligns the
+   * content and letterboxes the left, where the filler shows through.
+   * Narrow container: max() picks --grid-w, the box overflows equally both
+   * sides, "meet" has nothing left to letterbox, and overflow:hidden on the
+   * container crops it. Centring is what makes that crop symmetrical.
+   */
+  inset: 0 auto 0 50%;
+  width: max(100%, var(--grid-w));
   height: 100%;
-  /* no background here - let the container's tiled pattern show
+  transform: translateX(-50%);
+  /*
+   * src/css/base.css gives every svg max-width: 100%, which would clamp the
+   * max() straight back to the container's width — the overflow the crop
+   * depends on quietly disappears without this line.
+   */
+  max-width: none;
+  /* no background here - let the pseudo-element's tiled pattern show
      through underneath: both behind real cells' antialiased gaps, and
-     in the letterboxed space preserveAspectRatio="xMaxYMid meet"
-     (set in reveal.js) leaves to the left of the actual shape */
+     in the letterboxed space "meet" leaves to the left of the shape */
 }
 
 /* one rect per lit cell. no nested faces, no box-shadow: just
