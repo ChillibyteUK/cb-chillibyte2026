@@ -10,6 +10,14 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Disable the Theme and Plugin file editors in wp-admin. Core omits both
+// menu items (and blocks direct access to theme-editor.php/plugin-editor.php)
+// when this is set; defining it here rather than wp-config.php keeps the
+// hardening with the theme, and the guard respects a wp-config.php value.
+if ( ! defined( 'DISALLOW_FILE_EDIT' ) ) {
+	define( 'DISALLOW_FILE_EDIT', true );
+}
+
 define( 'CB_CHILLIBYTE_2026_DIR', get_template_directory() );
 
 require_once CB_CHILLIBYTE_2026_DIR . '/inc/setup.php';
@@ -28,3 +36,6 @@ require_once CB_CHILLIBYTE_2026_DIR . '/inc/posttypes.php';
 require_once CB_CHILLIBYTE_2026_DIR . '/inc/taxonomies.php';
 require_once CB_CHILLIBYTE_2026_DIR . '/inc/service-cards.php';
 require_once CB_CHILLIBYTE_2026_DIR . '/inc/person-meta.php';
+require_once CB_CHILLIBYTE_2026_DIR . '/inc/security.php';
+require_once CB_CHILLIBYTE_2026_DIR . '/inc/media.php';
+require_once CB_CHILLIBYTE_2026_DIR . '/inc/toc.php';

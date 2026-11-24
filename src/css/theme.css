@@ -8,8 +8,10 @@
 @import "footer.css";
 @import "single.css";
 @import "forms.css";
+@import "quote.css";
+@import "toc.css"; /* [cb_toc], see inc/toc.php */
 @import "gravity-forms.css"; /* legacy gravity-theme overrides — keep after forms.css */
-@import "utilities.css"; /* generated — see src/build/generate-utilities.js, run `npm run css-generate` */
+@import "utilities.css"; /* generated — see src/build/generate-utilities.js, run `pnpm run css-generate` */
 /* @import "tables.css"; -- uncomment if this project actually needs styled tables */
 @import "accordion.css"; /* used by blocks/cb-faqs */
 @import "blocks.css"; /* generated — concatenation of src/blocks/*.css, see src/build/generate-utilities.js */

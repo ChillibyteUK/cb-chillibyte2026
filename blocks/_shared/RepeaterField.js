@@ -1,5 +1,9 @@
 import { __ } from "@wordpress/i18n";
-import { MediaUpload, MediaUploadCheck } from "@wordpress/block-editor";
+import {
+  MediaUpload,
+  MediaUploadCheck,
+  RichText,
+} from "@wordpress/block-editor";
 import {
   TextControl,
   TextareaControl,
@@ -7,6 +11,8 @@ import {
   Button,
   RadioControl,
 } from "@wordpress/components";
+import SiteUrlInput from "./SiteUrlInput";
+import useRowMotion from "./useRowMotion";
 
 /**
  * Generic repeater UI for a block attribute holding an array of row objects.
@@ -31,12 +37,17 @@ import {
  * @param {string}   props.label    Field group label.
  * @param {Object[]} props.value    Current rows.
  * @param {Function} props.onChange ( rows ) => void
- * @param {Object[]} props.fields   [ { name, label, type: 'text'|'number'|'textarea'|'image'|'file'|'link'|'radio', help, mimeTypes, linkTarget, options } ]
+ * @param {Object[]} props.fields   [ { name, label, type: 'text'|'number'|'textarea'|'richtext'|'image'|'file'|'link'|'radio', help, mimeTypes, linkTarget, options } ]
  *                                  `linkTarget` (link fields only) adds an "open in new tab" toggle,
+ *                                  The URL half of a `link` field is SiteUrlInput (type-ahead search of
+ *                                  pages and posts, same-site URLs stored as root-relative paths).
  *                                  storing `{name}Target` on the row — same opt-in shape as the
  *                                  top-level `link` field type's `link_target` option. `options`
  *                                  (radio fields only) is `[ { label, value } ]`, mirroring the
  *                                  top-level `select`/`radio` field types' options shape.
+ *                                  `richtext` stores an HTML string (a RichText field: bold/italic by default,
+ *                                  override with `allowedFormats`). Legacy plain-text values with line breaks
+ *                                  are shown with those breaks intact.
  * @param {Object}   props.emptyRow Shape of a freshly-added row, e.g. { stat: '', title: '' }.
  * @param {string}   [props.layout] 'row' (default) or 'column'.
  */
@@ -57,29 +68,17 @@ export default function RepeaterField({
     onChange(next);
   }
 
-  function addRow() {
-    onChange([...rows, { ...emptyRow }]);
-  }
+  // Stable row keys, slide-on-move and highlight — see useRowMotion.js.
+  const { keys, setRowRef, movedKey, addRow, moveRow, removeRow } =
+    useRowMotion(rows, onChange);
 
-  function removeRow(index) {
+  function confirmRemoveRow(index) {
     // eslint-disable-next-line no-alert -- a plain confirm() is enough
     // friction for an irreversible remove; no undo exists for this field.
     if (!window.confirm(__("Remove this row?", "cb-chillibyte-2026"))) {
       return;
     }
-    onChange(rows.filter((_row, i) => i !== index));
-  }
-
-  function moveRow(index, direction) {
-    const target = index + direction;
-    if (target < 0 || target >= rows.length) {
-      return;
-    }
-    const next = rows.slice();
-    const tmp = next[index];
-    next[index] = next[target];
-    next[target] = tmp;
-    onChange(next);
+    removeRow(index);
   }
 
   return (
@@ -111,7 +110,14 @@ export default function RepeaterField({
       )}
       <div className="cb-chillibyte-2026-repeater-field__rows">
         {rows.map((row, index) => (
-          <div className="cb-chillibyte-2026-repeater-field__row" key={index}>
+          <div
+            className={
+              "cb-chillibyte-2026-repeater-field__row" +
+              (keys[index] === movedKey ? " is-moved" : "")
+            }
+            key={keys[index]}
+            ref={setRowRef(keys[index])}
+          >
             <span className="cb-chillibyte-2026-repeater-field__number">
               {index + 1}
             </span>
@@ -163,14 +169,17 @@ export default function RepeaterField({
                         updateRow(index, { [`${field.name}Text`]: v })
                       }
                     />
-                    <TextControl
-                      type="url"
+                    <SiteUrlInput
                       label={__(`${field.label} URL`, "cb-chillibyte-2026")}
                       hideLabelFromVision={!isColumn}
-                      value={row[field.name] || ""}
+                      value={row[field.name]}
                       onChange={(v) => updateRow(index, { [field.name]: v })}
-                      help={field.help}
                     />
+                    {field.help && (
+                      <p className="cb-chillibyte-2026-editor-field__help">
+                        {field.help}
+                      </p>
+                    )}
                     {field.linkTarget && (
                       <ToggleControl
                         label={__(
@@ -220,6 +229,41 @@ export default function RepeaterField({
                       )}
                     />
                   </MediaUploadCheck>
+                );
+              }
+
+              if ("richtext" === field.type) {
+                return (
+                  <div
+                    className="cb-chillibyte-2026-repeater-field__richtext"
+                    key={field.name}
+                  >
+                    <span
+                      className={
+                        isColumn
+                          ? "cb-chillibyte-2026-editor-field__label"
+                          : "screen-reader-text"
+                      }
+                    >
+                      {field.label}
+                    </span>
+                    <RichText
+                      tagName="div"
+                      className="cb-chillibyte-2026-editor-field__control"
+                      aria-label={field.label}
+                      placeholder={field.label}
+                      allowedFormats={
+                        field.allowedFormats || ["core/bold", "core/italic"]
+                      }
+                      value={(row[field.name] || "").replace(/\r?\n/g, "<br>")}
+                      onChange={(v) => updateRow(index, { [field.name]: v })}
+                    />
+                    {field.help && (
+                      <p className="cb-chillibyte-2026-editor-field__help">
+                        {field.help}
+                      </p>
+                    )}
+                  </div>
                 );
               }
 
@@ -281,6 +325,7 @@ export default function RepeaterField({
             <div className="cb-chillibyte-2026-repeater-field__row-actions">
               <Button
                 size="small"
+                data-move="up"
                 label={__("Move up", "cb-chillibyte-2026")}
                 onClick={() => moveRow(index, -1)}
                 disabled={0 === index}
@@ -289,6 +334,7 @@ export default function RepeaterField({
               </Button>
               <Button
                 size="small"
+                data-move="down"
                 label={__("Move down", "cb-chillibyte-2026")}
                 onClick={() => moveRow(index, 1)}
                 disabled={index === rows.length - 1}
@@ -299,7 +345,7 @@ export default function RepeaterField({
                 size="small"
                 isDestructive
                 label={__("Remove", "cb-chillibyte-2026")}
-                onClick={() => removeRow(index)}
+                onClick={() => confirmRemoveRow(index)}
               >
                 &times;
               </Button>
@@ -307,7 +353,7 @@ export default function RepeaterField({
           </div>
         ))}
       </div>
-      <Button variant="primary" onClick={addRow}>
+      <Button variant="primary" onClick={() => addRow(emptyRow)}>
         {__("Add row", "cb-chillibyte-2026")}
       </Button>
     </div>

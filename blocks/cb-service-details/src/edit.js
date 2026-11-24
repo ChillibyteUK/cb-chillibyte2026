@@ -9,7 +9,7 @@ const itemsFields = [
   {
     name: "description",
     label: __("Description", "cb-chillibyte-2026"),
-    type: "textarea",
+    type: "richtext",
   },
 ];
 

@@ -30,7 +30,7 @@ if [ -d .git ] && [ -n "$(git status --short 2>/dev/null)" ]; then
   exit 1
 fi
 
-read -p "New theme name (e.g. \"LC New Client 2026\"): " new_name
+read -p "New theme name (e.g. \"CB New Client 2026\"): " new_name
 if [ -z "$new_name" ]; then
   echo "No theme name provided."
   exit 1

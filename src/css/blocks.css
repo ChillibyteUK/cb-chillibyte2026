@@ -638,12 +638,6 @@
   }
 }
 
-@media (max-width: 767.98px) {
-  .cb-service-details__intro {
-    font-size: var(--fs-base);
-  }
-}
-
 /* --- src/blocks/cb-services-nav.css --- */
 .cb-services-nav__grid {
   display: grid;

@@ -227,3 +227,76 @@ add_filter( 'allowed_block_types_all', 'cb_chillibyte_2026_disallow_unwanted_cor
 function cb_chillibyte_2026_wrap_block_in_container( $attributes, $content ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 	return '<div class="container">' . $content . '</div>';
 }
+
+/**
+ * Is this block empty — nothing visible in it?
+ *
+ * Containers (columns, groups) are empty when everything inside them is.
+ * Spacers are deliberately NOT treated as empty here: on this theme a spacer
+ * at the end of a page is intentional bottom spacing (legal pages, services),
+ * and trimming it would collapse that gap.
+ * Custom HTML counts as empty only if it holds no markup at all, so a lone
+ * JSON-LD script or shortcode block is kept.
+ *
+ * @param array $block Parsed block.
+ * @return bool
+ */
+function cb_chillibyte_2026_block_is_empty( $block ) {
+	$name = $block['blockName'] ?? null;
+
+	if ( null === $name ) {
+		return '' === trim( preg_replace( '/(&nbsp;|\s|<br\s*\/?>)+/i', ' ', $block['innerHTML'] ?? '' ) );
+	}
+
+	if ( in_array( $name, array( 'core/columns', 'core/column', 'core/group' ), true ) ) {
+		foreach ( $block['innerBlocks'] as $inner ) {
+			if ( ! cb_chillibyte_2026_block_is_empty( $inner ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	if ( in_array( $name, array( 'core/paragraph', 'core/heading', 'core/list' ), true ) ) {
+		if ( 'core/list' === $name && ! empty( $block['innerBlocks'] ) ) {
+			return false;
+		}
+		$text = wp_strip_all_tags( $block['innerHTML'] ?? '' );
+		return '' === trim( str_replace( array( '&nbsp;', "\xC2\xA0" ), ' ', $text ) );
+	}
+
+	if ( 'core/html' === $name ) {
+		return '' === trim( $block['innerHTML'] ?? '' );
+	}
+
+	return false;
+}
+
+/**
+ * Drop empty blocks from the end of a page's content on the front end.
+ *
+ * Editors often leave an empty paragraph or Columns block after the last
+ * real block, which renders as a blank stripe above the footer. Filtering at
+ * render time means nothing saved is changed and it can't come back.
+ *
+ * @param string $content Post content before blocks are rendered.
+ * @return string
+ */
+function cb_chillibyte_2026_trim_trailing_empty_blocks( $content ) {
+	if ( is_admin() || ! has_blocks( $content ) ) {
+		return $content;
+	}
+
+	$blocks = parse_blocks( $content );
+
+	while ( $blocks ) {
+		$last = end( $blocks );
+		if ( ! cb_chillibyte_2026_block_is_empty( $last ) ) {
+			break;
+		}
+		array_pop( $blocks );
+	}
+
+	return serialize_blocks( $blocks );
+}
+add_filter( 'the_content', 'cb_chillibyte_2026_trim_trailing_empty_blocks', 8 );

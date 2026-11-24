@@ -138,7 +138,7 @@ function get_title_animation( $slug ) {
  * Read the generated hero grid-reveal animation config.
  *
  * The list is baked at build time by src/build/generate-hero-animations.js
- * (npm run generate-hero-animations), which reads whatever
+ * (pnpm run generate-hero-animations), which reads whatever
  * animation/json/grid-*.json bitmaps exist and writes both this PHP file and
  * the editor's matching JS module. Deriving both ends from one build step is
  * what stops the dropdown and the bitmaps on disk drifting apart — that

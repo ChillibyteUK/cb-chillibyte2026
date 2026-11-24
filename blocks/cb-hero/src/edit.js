@@ -6,6 +6,7 @@ import {
   SelectControl,
   ToggleControl,
 } from "@wordpress/components";
+import SiteUrlInput from "../../_shared/SiteUrlInput";
 import EditorBlockShell from "../../_shared/EditorBlockShell";
 // GENERATED at build time from animation/json/grid-*.json — see
 // src/build/generate-hero-animations.js. Don't hand-maintain this list: an
@@ -66,17 +67,18 @@ export default function Edit({ attributes, setAttributes, clientId }) {
         value={subtitle}
         onChange={(value) => setAttributes({ subtitle: value })}
       />
-      <TextControl
-        label={__("CTA Text", "cb-chillibyte-2026")}
-        value={ctaText}
-        onChange={(value) => setAttributes({ ctaText: value })}
-      />
-      <TextControl
-        type="url"
-        label={__("CTA URL", "cb-chillibyte-2026")}
-        value={ctaUrl}
-        onChange={(value) => setAttributes({ ctaUrl: value })}
-      />
+      <div className="cb-chillibyte-2026-editor-field-pair">
+        <TextControl
+          label={__("CTA Text", "cb-chillibyte-2026")}
+          value={ctaText}
+          onChange={(value) => setAttributes({ ctaText: value })}
+        />
+        <SiteUrlInput
+          label={__("CTA URL", "cb-chillibyte-2026")}
+          value={ctaUrl}
+          onChange={(value) => setAttributes({ ctaUrl: value })}
+        />
+      </div>
       <ToggleControl
         label={__("Open CTA in a new tab", "cb-chillibyte-2026")}
         checked={ctaTarget}

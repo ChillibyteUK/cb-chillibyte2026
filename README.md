@@ -83,15 +83,15 @@ nesting are all used without hesitation.
 
 ```
 pnpm install
-npm run watch        # rebuilds theme-wide CSS/JS on save
-npm run watch-bs     # same, plus browser-sync live reload (proxies localhost/)
-npm run blocks:build # compiles every block's src/index.js
-npm run blocks:start # watch mode for block JS
-npm run dist         # one-off full build: css + js + blocks
-npm run generate-theme-json   # regenerate theme.json from tokens.css
+pnpm run watch        # rebuilds theme-wide CSS/JS on save
+pnpm run watch-bs     # same, plus browser-sync live reload (proxies localhost/)
+pnpm run blocks:build # compiles every block's src/index.js
+pnpm run blocks:start # watch mode for block JS
+pnpm run dist         # one-off full build: css + js + blocks
+pnpm run generate-theme-json   # regenerate theme.json from tokens.css
 ```
 
-`npm run css` runs three steps: `generate-utilities.js` (produces
+`pnpm run css` runs three steps: `generate-utilities.js` (produces
 `src/css/utilities.css` — the breakpoint-suffixed grid/utility classes — and
 `src/css/blocks.css`, a concatenation of `src/blocks/*.css`), then
 PostCSS (`postcss-import` + `postcss-nesting` + `autoprefixer`), then
@@ -111,7 +111,7 @@ textarea, richtext, image, url, link, number, select, checkbox). Generates
 using WordPress's own field components — no ACF, no `get_field()`), and
 `render.php` (front-end template, reading straight from `$attributes`).
 No registration step — `inc/blocks.php` auto-loads every `blocks/*/block.json`
-it finds. Run `npm run blocks:build` after scaffolding, or the block won't
+it finds. Run `pnpm run blocks:build` after scaffolding, or the block won't
 render correctly until `build/index.js` exists.
 
 Not yet supported by `add_block.sh` directly: repeater, gallery,
@@ -126,7 +126,7 @@ local-only) covers repeater/gallery/post_type generation that `add_block.sh`
 doesn't, if it's active on this environment.
 
 If the block needs custom styles, add `src/blocks/{block-slug}.css`; it's
-picked up automatically on the next `npm run css`, no registration step.
+picked up automatically on the next `pnpm run css`, no registration step.
 Load order for these is alphabetical by filename, not registration order.
 
 `rm_block.sh` removes a block: the whole `blocks/{slug}` directory plus its
